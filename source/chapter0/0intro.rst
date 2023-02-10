@@ -1,22 +1,34 @@
-引言
+Introduction
 =====================
 
-本章导读
+Chapter Guide
 --------------------------
 
-本章主要解释了在已经有一系列优秀的操作系统教材的情况下，为何要写本书。所以本章一开始就是分析学生目前学习操作系统碰到的困难和问题，并介绍如何参考操作系统历史，结合操作系统的完整实验来设计本书的各个章节来编写本书。接下来将从非常高层次的角度和计算机以及操作系统的发展史来进一步描述了什么是操作系统、操作系统的访问接口、操作系统的抽象、操作系统特征，让同学能够对操作系统有一个大致的整体把握。最后介绍了本书关联的操作系统实验环境（包括在线实验和本地实验等）的搭建过程，为后续开展各个操作系统实验打好基础。
+This chapter primary explains why we write this book, given the presence of a series of excellent Operating System textbooks. To this end, this chapter starts with analyzing the challenges and problems that students currently face; and introduce how we come up with each chapter of this book by referring to the Operating System history and overall experiments. Afterwards, we describe what is an Operating System, its access interfaces, abstractions, and characteristics from a high-level perspective, i.e., the evolution of computers and Operating System. At last, we introduce the setup procedures for the experimental environments (including online, local environment and etc) affiliated to this book, to lay out a solid background for experiments hereafter. 
+
+.. 本章主要解释了在已经有一系列优秀的操作系统教材的情况下，为何要写本书。所以本章一开始就是分析学生目前学习操作系统碰到的困难和问题，并介绍如何参考操作系统历史，结合操作系统的完整实验来设计本书的各个章节来编写本书。接下来将从非常高层次的角度和计算机以及操作系统的发展史来进一步描述了什么是操作系统、操作系统的访问接口、操作系统的抽象、操作系统特征，让同学能够对操作系统有一个大致的整体把握。最后介绍了本书关联的操作系统实验环境（包括在线实验和本地实验等）的搭建过程，为后续开展各个操作系统实验打好基础。
 
 
-为何要写这本操作系统书
+.. 为何要写这本操作系统书
+
+Why we write this book
 -------------------------------------------------------
 
-在目前的操作系统教学中，已有一系列优秀的操作系统教材，例如 William Stallings 的《Operating Systems Internals and Design Principles》，Avi Silberschatz 、 Peter Baer Galvin 和 Greg Gagne 的《Operating System Concepts》，
-Remzi H. Arpaci-Dusseau 和 Andrea C. Arpaci-Dusseau 的《Operating Systems: Three Easy Pieces》等。
+There are already a series of excellent Operating System textbooks for teaching, e.g, "Operating Systems Internals and Design Principles" from William Stallings, "Operating System Concepts" from Avi Silberschatz, Peter Baer Galvin and Greg Gagne,
+"Operating Systems: Three Easy Pieces" from Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau.
 
-有待思考的问题
+.. 在目前的操作系统教学中，已有一系列优秀的操作系统教材，例如 William Stallings 的《Operating Systems Internals and Design Principles》，Avi Silberschatz 、 Peter Baer Galvin 和 Greg Gagne 的《Operating System Concepts》，
+.. Remzi H. Arpaci-Dusseau 和 Andrea C. Arpaci-Dusseau 的《Operating Systems: Three Easy Pieces》等。
+
+
+.. 有待思考的问题
+
+Questions Warranting Thinking About
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-然而，从我们自 2000 年以来的教学实践来看，某些经典教材对操作系统的概念和原理很重视，但还有如下一些问题有待进一步思考：
+However, according to our teaching experiences since 2000 onwards, though some classic textbooks place overdue emphasis on Operating System concepts and principles, the following problems deserve a second thought:
+
+.. 然而，从我们自 2000 年以来的教学实践来看，某些经典教材对操作系统的概念和原理很重视，但还有如下一些问题有待进一步思考：
 
 - 原理与实践脱节：与操作系统的具体实现而言，操作系统的原理与概念相对过于抽象。目前的一些教材缺乏在“**操作系统的原理与概念**”和“**操作系统的设计与实现**”之间建立关联关系的桥梁，使得二者之间存在较大的鸿沟。这导致学生即使知道了操作系统的概念，还只能停留在“纸上谈兵”的阶段，依然不知如何实现一个操作系统。另外，学生在完成设计与实现操作系统的实验过程中，容易“一叶障目，不见泰山”，陷入到硬件规范、汇编代码、数据结构、编程优化等细节中，不知这些细节与操作系统概念的关系，缺少全局观和系统思维，难以与课堂上老师讲解的操作系统基本概念对应起来。
 - 缺少历史发展的脉络：以史为鉴，可以知兴替。操作系统的概念和原理是从实际操作系统设计与实现的历史发展过程中，随着计算机硬件和应用需求的变化，从无到有逐步演进而产生的，有其发展的历史渊源和规律。但目前的大部分教材只提及当前主流操作系统的概念和原理，有“凭空出现”的感觉，学生并不知道这些内容出现的前因后果，只知道 **“How”** ，而不知道 **“Why”** 。而且操作系统发展史上的很多设计思路和实践方法起起伏伏，不断演进，它们并没有过时，而是以新的形态出现。如操作系统远古阶段的 **LibOS** 设计思路在当前云计算时代重新焕发青春，成为学术机构和各大互联网企业探索的新热点。

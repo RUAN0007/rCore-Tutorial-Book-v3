@@ -78,7 +78,9 @@ This tutorial aims to demonstrate step-by-step how **from zero** use **Rust** to
 .. 这本教程旨在一步一步展示如何 **从零开始** 用 **Rust** 语言写一个基于 **RISC-V** 架构的 **类 Unix 内核** 。值得注意的是，本项目不仅支持模拟器环境（如 Qemu/terminus 等），还支持在真实硬件平台 Kendryte K210 上运行。
 
 
-导读
+.. 导读
+
+Guide
 ---------------------
 
 Please go through :ref:`Chapter 0 <link-chapter0>`, to have a general grasp over the project development background and operating system concepts. 
@@ -110,10 +112,9 @@ Collaboration on Project
 .. - 时间仓促，本项目还有很多不完善之处，欢迎大家积极在每一个章节的评论区留言，或者提交 Issues 或 Pull Requests，让我们一起努力让这本书变得更好！
 .. - 欢迎大家加入项目交流 QQ 群，群号：735045051
 
-Project Progress
-
 .. 项目进度
 
+Project Progress
 -----------------------
 
 - 2020-11-03: Finish setting up environment; start on documents. 
