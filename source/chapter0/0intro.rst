@@ -4,7 +4,7 @@ Introduction
 Chapter Guide
 --------------------------
 
-This chapter primary explains why we write this book, given the presence of a series of excellent Operating System textbooks. To this end, this chapter starts with analyzing the challenges and problems that students currently face; and introduce how we come up with each chapter of this book by referring to the Operating System history and overall experiments. Afterwards, we describe what is an Operating System, its access interfaces, abstractions, and characteristics from a high-level perspective, i.e., the evolution of computers and Operating System. At last, we introduce the setup procedures for the experimental environments (including online, local environment and etc) affiliated to this book, to lay out a solid background for experiments hereafter. 
+This chapter primary explains why we write this book, given the presence of a series of excellent Operating System textbooks. To this end, this chapter starts with analyzing the challenges and problems that students currently face; and introduce how we come up with each chapter of this book by referring to the Operating System history and overall experiments. Afterwards, we describe what is an operating system, its access interfaces, abstractions, and characteristics from a high-level perspective, i.e., the evolution of computers and operating system. At last, we introduce the setup procedures for the experimental environments (including online, local environment and etc) affiliated to this book, to lay out a solid background for experiments hereafter. 
 
 .. 本章主要解释了在已经有一系列优秀的操作系统教材的情况下，为何要写本书。所以本章一开始就是分析学生目前学习操作系统碰到的困难和问题，并介绍如何参考操作系统历史，结合操作系统的完整实验来设计本书的各个章节来编写本书。接下来将从非常高层次的角度和计算机以及操作系统的发展史来进一步描述了什么是操作系统、操作系统的访问接口、操作系统的抽象、操作系统特征，让同学能够对操作系统有一个大致的整体把握。最后介绍了本书关联的操作系统实验环境（包括在线实验和本地实验等）的搭建过程，为后续开展各个操作系统实验打好基础。
 
@@ -14,7 +14,7 @@ This chapter primary explains why we write this book, given the presence of a se
 Why we write this book
 -------------------------------------------------------
 
-There are already a series of excellent Operating System textbooks for teaching, e.g, "Operating Systems Internals and Design Principles" from William Stallings, "Operating System Concepts" from Avi Silberschatz, Peter Baer Galvin and Greg Gagne,
+There are already a series of excellent operating system textbooks for teaching, e.g, "Operating Systems Internals and Design Principles" from William Stallings, "Operating System Concepts" from Avi Silberschatz, Peter Baer Galvin and Greg Gagne,
 "Operating Systems: Three Easy Pieces" from Remzi H. Arpaci-Dusseau and Andrea C. Arpaci-Dusseau.
 
 .. 在目前的操作系统教学中，已有一系列优秀的操作系统教材，例如 William Stallings 的《Operating Systems Internals and Design Principles》，Avi Silberschatz 、 Peter Baer Galvin 和 Greg Gagne 的《Operating System Concepts》，
@@ -23,104 +23,181 @@ There are already a series of excellent Operating System textbooks for teaching,
 
 .. 有待思考的问题
 
-Questions Warranting Thinking About
+Questions Worth Musing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-However, according to our teaching experiences since 2000 onwards, though some classic textbooks place overdue emphasis on Operating System concepts and principles, the following problems deserve a second thought:
+However, according to our teaching experiences since 2000 onwards, though some classic textbooks place overdue emphasis on operating system concepts and principles, the following problems deserve a second thought:
 
 .. 然而，从我们自 2000 年以来的教学实践来看，某些经典教材对操作系统的概念和原理很重视，但还有如下一些问题有待进一步思考：
 
-- 原理与实践脱节：与操作系统的具体实现而言，操作系统的原理与概念相对过于抽象。目前的一些教材缺乏在“**操作系统的原理与概念**”和“**操作系统的设计与实现**”之间建立关联关系的桥梁，使得二者之间存在较大的鸿沟。这导致学生即使知道了操作系统的概念，还只能停留在“纸上谈兵”的阶段，依然不知如何实现一个操作系统。另外，学生在完成设计与实现操作系统的实验过程中，容易“一叶障目，不见泰山”，陷入到硬件规范、汇编代码、数据结构、编程优化等细节中，不知这些细节与操作系统概念的关系，缺少全局观和系统思维，难以与课堂上老师讲解的操作系统基本概念对应起来。
-- 缺少历史发展的脉络：以史为鉴，可以知兴替。操作系统的概念和原理是从实际操作系统设计与实现的历史发展过程中，随着计算机硬件和应用需求的变化，从无到有逐步演进而产生的，有其发展的历史渊源和规律。但目前的大部分教材只提及当前主流操作系统的概念和原理，有“凭空出现”的感觉，学生并不知道这些内容出现的前因后果，只知道 **“How”** ，而不知道 **“Why”** 。而且操作系统发展史上的很多设计思路和实践方法起起伏伏，不断演进，它们并没有过时，而是以新的形态出现。如操作系统远古阶段的 **LibOS** 设计思路在当前云计算时代重新焕发青春，成为学术机构和各大互联网企业探索的新热点。
-- 忽视硬件细节或用复杂硬件：很多教材忽视或抽象硬件细节，使得操作系统概念难以落地，学生了解不到软硬件是如何具体协同运行的。部分教材把复杂的 x86 处理器作为操作系统实验的硬件参考平台，缺乏对当前快速发展的 RISC-V 等精简体系结构的实验支持，使得学生在操作系统实验中可能需要花较大代价了解相对繁杂的 x86 硬件细节，编程容易产生缺陷（bug），影响操作系统实验的效果，以及对操作系统核心概念的掌握。
+- Disconnection between Theory and Practice: compared to its concrete implemention, the Operation System's principles and concepts are relatively vague. Existing textbooks do not do well to bridge "**principles and concepts of operating system**" with "**its design and implementation**", widening the chasm between them. As a result, even though students are instilled with abundant concepts, they have no ideas how to imnplement an operating system, as if "talking about stratagems on paper". On the other hand, in the operating system design and implementation experiments, students tend to miss the wood for the trees, i.e., get lost into unnecessary details of hardware conventions, assembly codes, data structures, program optimization, and etc, unaware of their relationship to the operating system concepts, lacking a panoramic view and systematic methodology, hard to correspond them to basic concepts taught by teachers in lectures. 
 
-解决问题的思路
+.. - 原理与实践脱节：与操作系统的具体实现而言，操作系统的原理与概念相对过于抽象。目前的一些教材缺乏在“**操作系统的原理与概念**”和“**操作系统的设计与实现**”之间建立关联关系的桥梁，使得二者之间存在较大的鸿沟。这导致学生即使知道了操作系统的概念，还只能停留在“纸上谈兵”的阶段，依然不知如何实现一个操作系统。另外，学生在完成设计与实现操作系统的实验过程中，容易“一叶障目，不见泰山”，陷入到硬件规范、汇编代码、数据结构、编程优化等细节中，不知这些细节与操作系统概念的关系，缺少全局观和系统思维，难以与课堂上老师讲解的操作系统基本概念对应起来。
+
+- Scarcity of the Revelation of Historical Evolution: History teaches us how booms and busts go. The operating system principles and concepts come from the historical developments of their own design and implementation, which evolve incrementally from zero along with the developments of computer hardwares and application demands, a process abundant with historical trends and tendency. However, existing textbooks only scratch the surface on the principles and concepts of current mainstream operating systems, giving a false sense that "they appear out of thin air". Students, unaware of their back and forth, are limited to **"How"** instead of **"Why"**. And in the operaing system history, many design ideas and practices go up and down and evolve continuously. They are not outdated, but emerged as new paradigms. For example, the design philosophy of **LibOS**, a prehistoric operating system, renewes its youth in the current era of Cloud Computing, as a brand-new hot topic for acadamia and internet giants to explore. 
+
+.. - 缺少历史发展的脉络：以史为鉴，可以知兴替。操作系统的概念和原理是从实际操作系统设计与实现的历史发展过程中，随着计算机硬件和应用需求的变化，从无到有逐步演进而产生的，有其发展的历史渊源和规律。但目前的大部分教材只提及当前主流操作系统的概念和原理，有“凭空出现”的感觉，学生并不知道这些内容出现的前因后果，只知道 **“How”** ，而不知道 **“Why”** 。而且操作系统发展史上的很多设计思路和实践方法起起伏伏，不断演进，它们并没有过时，而是以新的形态出现。如操作系统远古阶段的 **LibOS** 设计思路在当前云计算时代重新焕发青春，成为学术机构和各大互联网企业探索的新热点。
+
+- Neglection on Hardware Details or The Use of Overly Complex Hardwares: may textbooks neglect or overly abstract hardware details, difficult to put concrete operating system concepts; students can not touch on how the software and hardware coordinate. Some textbooks choose complex x86 processor as operating system experiment platform, but overlook the support on fast-developing RSIC-V and other reduced instruction set computer architectures. As a results, students have taken unduely efforts to understand overly complex x86 hardware details, which easily generate bugs in their programming, affect their experimental effects, and hinder their understanding on operating system core concepts. 
+
+.. - 忽视硬件细节或用复杂硬件：很多教材忽视或抽象硬件细节，使得操作系统概念难以落地，学生了解不到软硬件是如何具体协同运行的。部分教材把复杂的 x86 处理器作为操作系统实验的硬件参考平台，缺乏对当前快速发展的 RISC-V 等精简体系结构的实验支持，使得学生在操作系统实验中可能需要花较大代价了解相对繁杂的 x86 硬件细节，编程容易产生缺陷（bug），影响操作系统实验的效果，以及对操作系统核心概念的掌握。
+
+.. 解决问题的思路
+
+Ideas to Address Problems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-这些现存问题增加了学生学习和掌握操作系统的难度。我们尝试通过如下方法来解决上面三个问题，达到缓解学生的学习压力，提升学习兴趣，能在一个学期内比较好地掌握操作系统的目标。
+These exsiting problems add to the students' difficulties to learn and understand an operating system. We attempt to address the above three problems using the following approaches, in order to relieve the student's pressure, arouse their interest, achieve the objective to understand well an operating system within a semester. 
 
-具体而言，为应对“原理与实践脱节”的问题，我们强调 **实践先行，实践引领原理** 的教学理念。MIT 教授 Frans Kaashoek 等师生设计实现了基于 UNIX v6 的 xv6 教学操作系统用于每年的本科操作系统课的实验中，并在课程讲解中把原理和实验结合起来，在国际上得到了广泛的认可，也给了我们很好的启发。经过十多年的操作系统教学工作，我们认为：对一位计算机专业的本科生而言，设计实现一个操作系统（包括CPU）有挑战但可行，前提是这样的操作系统要简洁小巧，能体现操作系统中最基本的核心思想，并能把操作系统各主要部分的原理与概念关联起来，形成一个整体。而且还需要丰富的配套资源，比如对操作系统的整体框架、核心算法、关键组件之间的联系等的分析文档、配套的图示和视频讲解、能够自动测试操作系统功能的测试用例和测试环境、能展现操作系统逐步编写过程的在线源代码版本管理环境，以及逐步递进的综合性在线实验环境等，这样就能够让学生很方便地通过实践来加深对操作系统原理和概念的理解，并能让操作系统原理和概念落地。
+.. 这些现存问题增加了学生学习和掌握操作系统的难度。我们尝试通过如下方法来解决上面三个问题，达到缓解学生的学习压力，提升学习兴趣，能在一个学期内比较好地掌握操作系统的目标。
 
-为应对“缺少历史发展的脉络”的问题，我们重新设计操作系统实验和教学内容，按照操作系统的历史发展过程来设立每一章的内容，每一章会围绕操作系统支持应用的某个核心目标来展开，形成相应的软硬件基本知识点和具体实践内容。同时建立与每章配套的多个逐步递进且相对独立的小实验，每个实验会形成一个独立的操作系统，体现了操作系统的一个微缩的发展历史，并可从中归纳总结出操作系统相关的概念与原理。这样可以在教学中引导学生理解操作系统的这些概念和原理是如何一步一步演进的。表面上看，这样会要求同学了解多个不同的操作系统，增加了同学的学习负担。但其实每个实验中的操作系统都是在前一个实验的操作系统上的渐进式扩展，同学只需理解差异的部分即可。而且学生通过分析不同操作系统对应用支持能力和对应实现上的差异，可以更加深入地理解相关操作系统概念与原理出现的前因后果。也许有同学认为讲解历史上的操作系统太过时了。但我们认为：技术可以过时，思想值得传承。
+In particular, to address "Disconnection between Theory and Practice", we emphasize the pedagogical philosophy of **Practice first, Practice over Principles"**. MIT Professor Frans Kasshoek and related, who implement UNIX-v6-based operating system xv6 used for undergraduate course experiments and fuse principles and experiments in the course, has gained wide recognitions across the globe and also gives us a great inspiration. From our more-than-ten-year teaching experience in operating systems, we believe: for a Computer Science undergraduate, to design and implement an operating system (including a CPU) is challeging but viable, on the premise that the operating system is neat and smart, which is capable to embody the basic core ideas of an operating system, bridge principles and concepts of the majority parts of an operating system to form a cohesive whole. And affiliated resources are required, such as the analysis documents, affiliated diagrams and video explanations on the operating system framework, core algorithms, and critical component relationships, the testing cases and environments to auto-test an operating system's functionalities, the online version control management environment to demonstrate an operating system's development phases, and an incremental comprehensive online experimental environment; so thats students are easy to deepen their understanding on the operating system concepts and principles through practices, and make these concepts and principles land. 
 
-为应对“忽视硬件细节或用复杂硬件”的问题，我们在硬件（x86, ARM, MIPS, RISC-V 等）和编程语言（C, C++, Go, Rust 等）选择方面进行了多年尝试。在 2017 年把 复杂的 x86 架构换为 简洁的 RISC-V 架构，作为操作系统实验的硬件环境，降低了学生学习硬件细节的负担。在 2018 年引入 Rust 编程语言作为操作系统实验的可选编程语言之一，通过Rust语言特有的编译时内存/并发安全检查、强类型静态分析、高级数据结构支持、抽象封装支持、内嵌汇编和丰富的第三方库，来提高编程效率、降低调试成本，从而减少了用C语言编程和对硬件操作出现较多运行时缺陷的情况。使得学生以相对较小的开发和调试代价进行操作系统实验。同时，我们把操作系统的概念和原理直接对应到程序代码、硬件规范和操作系统的实际执行中，加强学生对操作系统内涵的实际体验和感受。
+.. 具体而言，为应对“原理与实践脱节”的问题，我们强调 **实践先行，实践引领原理** 的教学理念。MIT 教授 Frans Kaashoek 等师生设计实现了基于 UNIX v6 的 xv6 教学操作系统用于每年的本科操作系统课的实验中，并在课程讲解中把原理和实验结合起来，在国际上得到了广泛的认可，也给了我们很好的启发。经过十多年的操作系统教学工作，我们认为：对一位计算机专业的本科生而言，设计实现一个操作系统（包括CPU）有挑战但可行，前提是这样的操作系统要简洁小巧，能体现操作系统中最基本的核心思想，并能把操作系统各主要部分的原理与概念关联起来，形成一个整体。而且还需要丰富的配套资源，比如对操作系统的整体框架、核心算法、关键组件之间的联系等的分析文档、配套的图示和视频讲解、能够自动测试操作系统功能的测试用例和测试环境、能展现操作系统逐步编写过程的在线源代码版本管理环境，以及逐步递进的综合性在线实验环境等，这样就能够让学生很方便地通过实践来加深对操作系统原理和概念的理解，并能让操作系统原理和概念落地。
+
+To address "Scarcity of the Revelation of Historical Evolution", we overhaul the operating system experiment and course content, the content of each chapter devised according to a phase of the operating system historical developments. Each chapter is oriented towards one of core demands from applications, which is supported by the operating system, and then induce basic software and hardware knowledge points and concrete practices. In the meantime, each chapter comes with a series of incrementally stepped and independent minor experiments, each of which makes up an independent operating system and epitomizes a compressed development history of an operating system. From these, the operating system concepts and principles can be summarized and generalized. In this way, students can be guided in teaching to understand how these concepts and principles of the operating system evolve step by step. On the surface, this will require students to understand multiple different operating systems, which will increase their learning burden. But in fact, the operating system in each experiment is a gradual expansion of the operating system in the previous experiment, and students only need to understand the differences. Moreover, by analyzing the differences in application support capabilities and corresponding implementations of different operating systems, students can gain a deeper understanding of the causes and consequences of the emergence of related operating system concepts and principles. Some students may think that explaining the operating system in history is too outdated. But we believe that technology can be outdated, but ideas are worth passing on.
 
 
-如何基于本书学习操作系统
----------------------------------------------
+.. 为应对“缺少历史发展的脉络”的问题，我们重新设计操作系统实验和教学内容，按照操作系统的历史发展过程来设立每一章的内容，每一章会围绕操作系统支持应用的某个核心目标来展开，形成相应的软硬件基本知识点和具体实践内容。同时建立与每章配套的多个逐步递进且相对独立的小实验，每个实验会形成一个独立的操作系统，体现了操作系统的一个微缩的发展历史，并可从中归纳总结出操作系统相关的概念与原理。这样可以在教学中引导学生理解操作系统的这些概念和原理是如何一步一步演进的。表面上看，这样会要求同学了解多个不同的操作系统，增加了同学的学习负担。但其实每个实验中的操作系统都是在前一个实验的操作系统上的渐进式扩展，同学只需理解差异的部分即可。而且学生通过分析不同操作系统对应用支持能力和对应实现上的差异，可以更加深入地理解相关操作系统概念与原理出现的前因后果。也许有同学认为讲解历史上的操作系统太过时了。但我们认为：技术可以过时，思想值得传承。
 
-前期准备
+- To address "Neglection on Hardware Details or The Use of Overly Complex Hardwares", we have tried for many years to choose between hardwares (x86, ARM, MIPS, RISC-V, etc.) and programming languages (C, C++, Go, Rust, etc.) choices. In 2017, the complex x86 architecture was replaced with a simple RISC-V architecture as the hardware environment for operating system experiments, reducing the burden on students to learn hardware details. We ushered in the Rust programming language as one of the optional programming languages ​​for operating system experiments in 2018. By relying on Rust language-specific compile-time memory/concurrency security checks, strong type static analysis, advanced data structure support, abstract encapsulation support, inline assembly and abundant third-party libraries that improve programming efficiency and reduce debugging costs, the occurrence of more runtime defects in C language programming and hardware operations can be reduced. It enables students to conduct operating system experiments with a relatively small cost of development and debugging. At the same time, we directly correspond the concepts and principles of the operating system to the actual implementation of the program code, hardware specification and operating system, so as to strengthen students' actual experience and feeling of the connotation of the operating system.
+
+
+.. 为应对“忽视硬件细节或用复杂硬件”的问题，我们在硬件（x86, ARM, MIPS, RISC-V 等）和编程语言（C, C++, Go, Rust 等）选择方面进行了多年尝试。在 2017 年把 复杂的 x86 架构换为 简洁的 RISC-V 架构，作为操作系统实验的硬件环境，降低了学生学习硬件细节的负担。在 2018 年引入 Rust 编程语言作为操作系统实验的可选编程语言之一，通过Rust语言特有的编译时内存/并发安全检查、强类型静态分析、高级数据结构支持、抽象封装支持、内嵌汇编和丰富的第三方库，来提高编程效率、降低调试成本，从而减少了用C语言编程和对硬件操作出现较多运行时缺陷的情况。使得学生以相对较小的开发和调试代价进行操作系统实验。同时，我们把操作系统的概念和原理直接对应到程序代码、硬件规范和操作系统的实际执行中，加强学生对操作系统内涵的实际体验和感受。
+
+
+.. 如何基于本书学习操作系统
+
+How to Learn Operating System based on this Book
+-------------------------------------------------
+
+.. 前期准备
+
+Preliminaries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-学习操作系统需要有一些前期准备，主要包括计算机科学基础知识，比如计算机组成原理、数据结构与算法、编程语言、软件开发环境等。具体而言，需要了解计算机的基本原理，特别是RISC-V处理器的指令集和部分特权操作；还有就是需要掌握基本的数据结构和算法，毕竟操作系统也是一种软件，需要通过多种数据结构和算法了解决问题；在了解操作系统的设计并进行操作系统实验的过程中，需要掌握系统级的高级编程语言和汇编语言，比如C或Rust编程语言，RISC-V汇编语言，这样才能深入理解操作系统的实现细节和设计思想；最后还需掌握操作系统的开发与实验环境，本书的主要涉及的开发与实验环境是Linux，所以同学们需要能够通过Linux的命令行界面使用各种开发工具和辅助工具，而掌握基于图形界面或字符界面的IDE集成开发环境，如VSCode、Vim、Emacs等，可以提高分析操作系统源码，简化操作系统的开发与调试过程。
+Learning the operating system requires some preliminary preparations, mainly including basic knowledge of computer science, such as computer architectures, data structures and algorithms, programming languages, software development environments, etc. Specifically, it is necessary to understand the basic principles of computers, especially the instruction set and some privileged operations of RISC-V processors; there is also the need to master basic data structures and algorithms. After all, the operating system is also a kind of software, which requires a variety of Data structures and algorithms are used to solve problems; in the process of understanding the design of the operating system and conducting operating system experiments, it is necessary to master the system-level high-level programming language and assembly language, such as C or Rust programming language, RISC-V assembly language, for the in-depth understanding of the implementation details and design ideas of the operating system; finally, you need to master the development and experimental environment of the operating system. The main development and experimental environment involved in this book is Linux, so students need to be able to use various development tools and auxiliary tools, and mastering the IDE integrated development environment based on graphical interface or character interface, such as VSCode, Vim, Emacs, etc., which can improve the analysis of operating system source code and simplify the development and debugging process of the operating system.
 
 
-目标与步骤
+.. 学习操作系统需要有一些前期准备，主要包括计算机科学基础知识，比如计算机组成原理、数据结构与算法、编程语言、软件开发环境等。具体而言，需要了解计算机的基本原理，特别是RISC-V处理器的指令集和部分特权操作；还有就是需要掌握基本的数据结构和算法，毕竟操作系统也是一种软件，需要通过多种数据结构和算法了解决问题；在了解操作系统的设计并进行操作系统实验的过程中，需要掌握系统级的高级编程语言和汇编语言，比如C或Rust编程语言，RISC-V汇编语言，这样才能深入理解操作系统的实现细节和设计思想；最后还需掌握操作系统的开发与实验环境，本书的主要涉及的开发与实验环境是Linux，所以同学们需要能够通过Linux的命令行界面使用各种开发工具和辅助工具，而掌握基于图形界面或字符界面的IDE集成开发环境，如VSCode、Vim、Emacs等，可以提高分析操作系统源码，简化操作系统的开发与调试过程。
+
+
+.. 目标与步骤
+
+Objectives and Procedures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-所以本书的目标是以简洁的 RISC-V 基本架构为底层硬件基础，根据上层应用从小到大的需求，按 OS 发展的历史脉络，逐步讲解如何设计实现能满足“从简单到复杂”应用需求的多个“小”操作系统。并且在设计实现操作系统的过程中，逐步解析操作系统各种概念与原理的知识点，做到有“理”可循和有“码”可查，最终让同学通过操作系统设计与实现来深入地掌握操作系统的概念与原理。
+Therefore, the goal of this book is to take the simple RISC-V basic architecture as the underlying hardware foundation, according to the needs of upper-layer applications from small to large, and according to the historical context of OS development, gradually explain how to design and implement multiple "little" operating systems to meet the application requirements "from simple to complex". And in the process of designing and implementing the operating system, gradually analyze the knowledge points of various concepts and principles of the operating system, so that there are "reasons" to follow and "codes" to check, and finally let students go deeper through the design and implementation of the operating system to master the concepts and principles of the operating system.
 
+.. 所以本书的目标是以简洁的 RISC-V 基本架构为底层硬件基础，根据上层应用从小到大的需求，按 OS 发展的历史脉络，逐步讲解如何设计实现能满足“从简单到复杂”应用需求的多个“小”操作系统。并且在设计实现操作系统的过程中，逐步解析操作系统各种概念与原理的知识点，做到有“理”可循和有“码”可查，最终让同学通过操作系统设计与实现来深入地掌握操作系统的概念与原理。
 
-在本书中，第零章是对操作系统的一个概述，让同学对操作系统的历史、定义、特征等概念上有一个大致的了解。后面的每个章节体现了操作系统的一个微缩的历史发展过程，即从对应用由简到繁的支持角度出发，每章会讲解如何设计一个可运行应用的操作系统，满足应用的阶段性需求。从而同学可以通过配套的操作系统设计实验，了解如何从一个微不足道的“小”操作系统，根据应用需求，添加或增强操作系统功能，逐步形成一个类似 UNIX 的相对完善的“小”操作系统。每一步都小到足以让人感觉到易于掌控。而在每一步结束时，你都能运行一个支持不同应用执行的“小”操作系统。
+In this book, Chapter 0 is an overview of the operating system, allowing students to have a general understanding of the history, definitions, characteristics and other concepts of the operating system. Each of the following chapters reflects a miniature historical development process of the operating system, that is, from the perspective of supporting applications from simple to complex, each chapter will explain how to design an operating system that can run applications to meet the phased requirements of applications . In this way, students can learn how to add or enhance operating system functions from a trivial "small" operating system according to application requirements through supporting operating system design experiments, and gradually form a relatively complete "small" operating system similar to UNIX. Each step is small enough to feel manageable. And at the end of each step, you can run a "small" operating system that supports the execution of different applications.
+
+.. 在本书中，第零章是对操作系统的一个概述，让同学对操作系统的历史、定义、特征等概念上有一个大致的了解。后面的每个章节体现了操作系统的一个微缩的历史发展过程，即从对应用由简到繁的支持角度出发，每章会讲解如何设计一个可运行应用的操作系统，满足应用的阶段性需求。从而同学可以通过配套的操作系统设计实验，了解如何从一个微不足道的“小”操作系统，根据应用需求，添加或增强操作系统功能，逐步形成一个类似 UNIX 的相对完善的“小”操作系统。每一步都小到足以让人感觉到易于掌控。而在每一步结束时，你都能运行一个支持不同应用执行的“小”操作系统。
 
 ..
   chyyuu：有一个比较大的ascii图，画出我们做出的各种OSes。
 
-.. admonition:: **本书提供了哪些“小”操作系统？**
+.. admonition:: **Which miniature operating systems does this book offer?**
    :class: note
 
-   我们按照操作系统的发展历史，设计了如下一些逐步进化的“小”操作系统
+   According to the development history of the operating system, we have designed the following gradually evolving "small" operating systems
   
-   - LibOS: 让APP与HW隔离，简化应用访问硬件的难度和复杂性
-   - BatchOS： 让APP与OS隔离，加强系统安全，提高执行效率
-   - Multiprog & Timesharing OS: 让APP共享CPU资源
-   - Address Space OS: 隔离APP访问的内存地址空间，限制APP之间的互相干涉，提高安全性
-   - Process OS: 支持APP动态创建新进程，增强进程管理和资源管理能力
-   - Filesystem OS：支持APP对数据的持久保存
-   - IPC OS：支持多个APP进程间数据交互与事件通知 
-   - Thread & Coroutine OS：支持线程和协程APP，简化切换与数据共享  
-   - SyncMutex OS：在多线程APP中支持对共享资源的同步互斥访问
-   - Device OS：提高APP的I/O效率和人机交互能力，支持基于外设中断的串口/块设备/键盘/鼠标/显示设备
+   - LibOS: Isolate applications from hardwares, simplifying the difficulty and complexity of applications accessing hardware
+   - BatchOS: isolate applications from operating systems, strengthen system security, and improve execution efficiency
+   - Multiprog & Timesharing OS: Allow applications to share CPU resources
+   - Address Space OS: Isolate the memory address space accessed by applications, limit the mutual interference between applicationss, and improve security
+   - Process OS: Support applications to dynamically create new processes, enhance process management and resource management capabilities
+   - Filesystem OS: Support applications for persistent storage of data
+   - IPC OS: Support data interaction and event notification between multiple applications processes
+   - Thread & Coroutine OS: Support thread and coroutine applications, simplify switching and data sharing
+   - SyncMutex OS: Supports synchronized mutual exclusion access to shared resources in multi-threaded apps
+   - Device OS: Improve applications's I/O efficiency and human-computer interaction capabilities, support serial ports/block devices/keyboard/mouse/display devices based on peripheral interrupts
 
-另外，通过足够详尽的测试程序和自动测试框架，可以随时验证同学实现的操作系统在每次更新后是否正常工作。由于实验的代码规模和实现复杂度在一个逐步递增的可控范围内，同学可以结合对应操作系统实验的原理/概念分析，来建立操作系统概念原理和实际实现的对应关系，从而能够通过操作系统实验的实践过程来加强对理论概念的理解，并通过理论概念来进一步指导操作系统实验的实现与改进。
+  ..  我们按照操作系统的发展历史，设计了如下一些逐步进化的“小”操作系统
+  
+  ..  - LibOS: 让APP与HW隔离，简化应用访问硬件的难度和复杂性
+  ..  - BatchOS： 让APP与OS隔离，加强系统安全，提高执行效率
+  ..  - Multiprog & Timesharing OS: 让APP共享CPU资源
+  ..  - Address Space OS: 隔离APP访问的内存地址空间，限制APP之间的互相干涉，提高安全性
+  ..  - Process OS: 支持APP动态创建新进程，增强进程管理和资源管理能力
+  ..  - Filesystem OS：支持APP对数据的持久保存
+  ..  - IPC OS：支持多个APP进程间数据交互与事件通知 
+  ..  - Thread & Coroutine OS：支持线程和协程APP，简化切换与数据共享  
+  ..  - SyncMutex OS：在多线程APP中支持对共享资源的同步互斥访问
+  ..  - Device OS：提高APP的I/O效率和人机交互能力，支持基于外设中断的串口/块设备/键盘/鼠标/显示设备
 
-.. admonition:: **如何学习操作系统？**
+In addition, through a sufficiently detailed test program and an automatic test framework, it is possible to verify at any time whether the operating system implemented by the students works normally after each update. Since the code size and implementation complexity of the experiment are within a gradually increasing controllable range, students can combine the principle/concept analysis of the corresponding operating system experiment to establish the corresponding relationship between the operating system concept principle and the actual implementation, so that they can strength their understanding on concepts and theories through operating system experimental practices, and, on the other hand, use these theories and concepts to further direct their implementation and improvements over experiments. 
+
+.. 另外，通过足够详尽的测试程序和自动测试框架，可以随时验证同学实现的操作系统在每次更新后是否正常工作。由于实验的代码规模和实现复杂度在一个逐步递增的可控范围内，同学可以结合对应操作系统实验的原理/概念分析，来建立操作系统概念原理和实际实现的对应关系，从而能够通过操作系统实验的实践过程来加强对理论概念的理解，并通过理论概念来进一步指导操作系统实验的实现与改进。
+
+.. admonition:: **How to Learn Operating System？**
    :class: note
 
-   这取决于你想学习操作系统的目标，这里主要分为两类：
+   It depends on your goal of learning the operating system, here are mainly divided into two categories:
 
-   - 掌握基本原理为主，了解具体实现为辅（一般学习）
+   - Master the basic principles first, and understand the specific implementation as a supplement (general learning)
 
-     - 理解式学习方式：逐章阅读与实践，阅读分析应用，并通过分析应用与OS的动态执行过程，掌握OS原理。
+     - Comprehensible learning method: read and practice chapter by chapter, read and analyze applications, and master OS principles by analyzing the dynamic execution process of applications and OS.
 
-   - 掌握操作系统实现和原理为主（深入学习）
+   - Master the implementation and principle of the operating system (in-depth study)
 
-     - 构造式学习：在理解式学习方式基础上，进一步分析源码，逐步深入了解每个OS的内部增量实现，并且参考并基于这些小OS，扩展部分OS功能，通过测试用例，从而同时掌握操作系统实现和原理。
+     - Constructive learning: based on the comprehensible learning method, further analyze the source code, gradually understand the internal incremental implementation of each OS, and refer to and based on these small OSs, expand some OS functions, and pass the test cases, so as to master the operation at the same time system implementation and principle.
 
-编程语言与硬件环境
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ..  这取决于你想学习操作系统的目标，这里主要分为两类：
 
-在你开始阅读与实践本书讲解的内容之前，你需要决定用什么编程语言来完成操作系统实验。你可以选择你喜欢的编程语言和在你喜欢的CPU上来实现操作系统。我们推荐的编程语言和架构分别是 Rust 和 RISC-V。
+  ..  - 掌握基本原理为主，了解具体实现为辅（一般学习）
+
+  ..    - 理解式学习方式：逐章阅读与实践，阅读分析应用，并通过分析应用与OS的动态执行过程，掌握OS原理。
+
+  ..  - 掌握操作系统实现和原理为主（深入学习）
+
+  ..    - 构造式学习：在理解式学习方式基础上，进一步分析源码，逐步深入了解每个OS的内部增量实现，并且参考并基于这些小OS，扩展部分OS功能，通过测试用例，从而同时掌握操作系统实现和原理。
+
+.. 编程语言与硬件环境
+
+Programming Language and Hardware Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before you start reading and practicing the content of this book, you need to decide what programming language to use to complete the operating system experiment. You can choose your favorite programming language and implement the operating system on your favorite CPU. Our recommended programming languages ​and architectures are Rust and RISC-V, respectively.
+
+
+.. 在你开始阅读与实践本书讲解的内容之前，你需要决定用什么编程语言来完成操作系统实验。你可以选择你喜欢的编程语言和在你喜欢的CPU上来实现操作系统。我们推荐的编程语言和架构分别是 Rust 和 RISC-V。
 
 
 
-.. admonition:: **编程语言与指令集选择**
+.. admonition:: **Choices Programming Languages and Instruction Sets**
    :class: note
 
-   **目前常见的操作系统内核都是基于 C 语言的，为何要推荐 Rust 语言？**
-   
-   - 事实上， C 语言就是为写 UNIX 而诞生的。Dennis Ritchie 和 KenThompson 没有期望设计一种新语言能帮助高效地开发复杂与并发的操作系统逻辑(面向未来)，而是希望用一种简洁的方式来代替难以使用的汇编语言抽象出计算机的行为，便于编写控制计算机硬件的操作系统（符合当时实际情况）。
-   - C 语言的指针既是天使又是魔鬼。它灵活且易于使用，但语言本身几乎不保证安全性，且缺少有效的并发支持。这导致内存和并发漏洞成为当前基于 C 语言的主流操作系统的噩梦。
-   - Rust 语言具有与 C 一样的硬件控制能力，且大大强化了安全编程和抽象编程能力。从某种角度上看，新出现的 Rust 语言的核心目标是解决 C 的短板，取代 C 。所以用 Rust 写 OS 具有很好的开发和运行体验。
-   - 用 Rust 写 OS 的代价仅仅是学会用 Rust 编程。
+   **Currently common operating system kernels are based on the C language, why recommend the Rust language?**
+   - In fact, the C language was born to write UNIX. Dennis Ritchie and Ken Thompson did not expect to design a new language to help efficiently develop complex and concurrent operating system logic (for the future), but hoped to use a concise way to replace the difficult-to-use assembly language to abstract computer behavior. It is convenient to write an operating system that controls computer hardware (according to the actual situation at the time).
+   - Pointers in the C language are both angels and devils. It's flexible and easy to use, but the language itself offers few guarantees of safety and lacks effective concurrency support. This leads to memory and concurrency bugs that are currently a nightmare for mainstream C-based operating systems.
+   - The Rust language has the same hardware control capabilities as C, and greatly strengthens the capabilities of safe programming and abstract programming. From a certain point of view, the core goal of the emerging Rust language is to solve the shortcomings of C and replace C. So writing OS with Rust has a good development and running experience.
+   - The cost of writing an OS in Rust is just learning to program in Rust.
 
-   **目前常见的指令集架构是 x86 和 ARM ，为何要推荐 RISC-V ？**
    
-   - 目前为止最常见的指令集架构是 x86 和 ARM ，它们已广泛应用在服务器、台式机、移动终端和很多嵌入式系统中。由于它们的通用性和向后兼容性需求，需要支持非常多（包括几十年前实现）的软件系统和应用需求，导致这些指令集架构越来越复杂。
-   - x86 后向兼容的策略确保了它在桌面和服务器领域的江湖地位，但导致其丢不掉很多已经比较过时的硬件设计，让操作系统通过冗余的代码来适配各种新老硬件特征。
-   - x86 和 ARM 在商业上都很成功，其广泛使用使得其 CPU 硬件逻辑越来越复杂，且不够开放，不能改变，不是开源的，难以让感兴趣探索硬件的学生了解硬件细节，在某种程度上让CPU成为了一个黑盒子，并使得操作系统与硬件的交互变得不那么透明，增加了学习操作系统的负担。
-   - 从某种角度上看，新出现的 RISC-V 的核心目标是灵活适应未来的 AIoT （人工智能物联网, AI + IoT）场景，保证基本功能，提供可配置的扩展功能。其开源特征使得学生都可以深入CPU的运行细节，甚至可以方便地设计一个 RISC-V CPU。从而可帮助学生深入了解操作系统与硬件的协同执行过程。
-   - 编写面向 RISC-V 的 OS 的硬件学习代价仅仅是你了解 RISC-V 的 Supervisor 特权模式，知道 OS 在 Supervisor 特权模式下的控制能力。
+   **The current common instruction set architectures are x86 and ARM, why recommend RISC-V?**
+   
+   - By far the most common instruction set architectures are x86 and ARM, which are widely used in servers, desktops, mobile terminals and many embedded systems. Due to their generality and backward compatibility requirements, the need to support a very large number (including implementations decades ago) of software systems and application requirements has led to the increasing complexity of these instruction set architectures.
+   - The x86 backward compatibility strategy ensures its status in the desktop and server fields, but it cannot lose many outdated hardware designs, allowing the operating system to adapt to various new and old hardware features through redundant code.
+   - Both x86 and ARM are commercially successful, and their widespread use makes their CPU hardware logic more and more complex, and it is not open enough to change, not open source, and it is difficult for students who are interested in exploring hardware to understand hardware details. To a certain extent, the CPU becomes a black box, and makes the interaction between the operating system and the hardware less transparent, increasing the burden of learning the operating system.
+   - From a certain point of view, the core goal of the emerging RISC-V is to flexibly adapt to future AIoT (Artificial Intelligence Internet of Things, AI + IoT) scenarios, guarantee basic functions, and provide configurable expansion functions. Its open source feature allows students to go deep into the details of CPU operation, and even design a RISC-V CPU conveniently. This can help students gain a deep understanding of the cooperative execution process of the operating system and hardware.
+   - The hardware learning cost of writing a RISC-V-oriented OS is just that you understand the Supervisor privileged mode of RISC-V and know the control ability of the OS in the Supervisor privileged mode.
+
+  ..  **目前常见的操作系统内核都是基于 C 语言的，为何要推荐 Rust 语言？**
+   
+  ..  - 事实上， C 语言就是为写 UNIX 而诞生的。Dennis Ritchie 和 KenThompson 没有期望设计一种新语言能帮助高效地开发复杂与并发的操作系统逻辑(面向未来)，而是希望用一种简洁的方式来代替难以使用的汇编语言抽象出计算机的行为，便于编写控制计算机硬件的操作系统（符合当时实际情况）。
+  ..  - C 语言的指针既是天使又是魔鬼。它灵活且易于使用，但语言本身几乎不保证安全性，且缺少有效的并发支持。这导致内存和并发漏洞成为当前基于 C 语言的主流操作系统的噩梦。
+  ..  - Rust 语言具有与 C 一样的硬件控制能力，且大大强化了安全编程和抽象编程能力。从某种角度上看，新出现的 Rust 语言的核心目标是解决 C 的短板，取代 C 。所以用 Rust 写 OS 具有很好的开发和运行体验。
+  ..  - 用 Rust 写 OS 的代价仅仅是学会用 Rust 编程。
+
+  ..  **目前常见的指令集架构是 x86 和 ARM ，为何要推荐 RISC-V ？**
+   
+  ..  - 目前为止最常见的指令集架构是 x86 和 ARM ，它们已广泛应用在服务器、台式机、移动终端和很多嵌入式系统中。由于它们的通用性和向后兼容性需求，需要支持非常多（包括几十年前实现）的软件系统和应用需求，导致这些指令集架构越来越复杂。
+  ..  - x86 后向兼容的策略确保了它在桌面和服务器领域的江湖地位，但导致其丢不掉很多已经比较过时的硬件设计，让操作系统通过冗余的代码来适配各种新老硬件特征。
+  ..  - x86 和 ARM 在商业上都很成功，其广泛使用使得其 CPU 硬件逻辑越来越复杂，且不够开放，不能改变，不是开源的，难以让感兴趣探索硬件的学生了解硬件细节，在某种程度上让CPU成为了一个黑盒子，并使得操作系统与硬件的交互变得不那么透明，增加了学习操作系统的负担。
+  ..  - 从某种角度上看，新出现的 RISC-V 的核心目标是灵活适应未来的 AIoT （人工智能物联网, AI + IoT）场景，保证基本功能，提供可配置的扩展功能。其开源特征使得学生都可以深入CPU的运行细节，甚至可以方便地设计一个 RISC-V CPU。从而可帮助学生深入了解操作系统与硬件的协同执行过程。
+  ..  - 编写面向 RISC-V 的 OS 的硬件学习代价仅仅是你了解 RISC-V 的 Supervisor 特权模式，知道 OS 在 Supervisor 特权模式下的控制能力。
 
 本书章节导引
 -----------------------------------------------
