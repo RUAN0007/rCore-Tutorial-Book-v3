@@ -1,39 +1,64 @@
-什么是操作系统
+.. 什么是操作系统
+
+What is an Operating System
 ================================================
 
 .. toctree::
    :hidden:
    :maxdepth: 5
 
-站在一万米的代码空间维度看
-----------------------------------
+.. 站在一万米的代码空间维度看
+
+Standing on the 10,000-meter altitude of code space and see from above
+------------------------------------------------------------------------------
 
 .. chyyuu What is an Operating System? A historical investigation (1954–1964) Maarten Bullynck
 
-一个操作系统（OS）是一个软件，它帮助用户和应用程序使用和管理计算机的资源。操作系统可能对最终用户不可见，但它控制着嵌入式设备、更通用的系统（如智能手机、台式计算机和服务器）以及巨型机等各种计算机系统。
+An operating system (OS) is software that helps users and applications use and manage a computer's resources. An operating system may not be visible to the end user, but it controls a variety of computer systems such as embedded devices, more general systems such as smartphones, desktop computers, and servers, and supercomputers.
 
-今天，我们很难想象在没有操作系统的情况下使用计算机，它塑造和构建了我们访问计算机及其外围设备的交互方式。当第一批电子计算机在第二次世界大战后被开发出来时，还没有操作系统这种软件。在计算机诞生十年后，才首次出现某种操作系统的尝试。又过了十年，操作系统才被大家广泛接受。
+.. 一个操作系统（OS）是一个软件，它帮助用户和应用程序使用和管理计算机的资源。操作系统可能对最终用户不可见，但它控制着嵌入式设备、更通用的系统（如智能手机、台式计算机和服务器）以及巨型机等各种计算机系统。
 
-我们的讨论将集中在通用操作系统上，因为它们需要的技术是嵌入式系统所需技术的超集，对操作系统原理、概念和技术的覆盖更加全面。现在的通用操作系统是一个复杂的系统软件，比如 Linux 操作系统达到了千万行的 C 源码量级。在学习操作系统的初期，如果去分析了解这样大规模的软件，要付出巨大的代价，因此我们对其进行简化，只讨论最基本的功能。
+Today, it's hard to imagine using a computer without an operating system, which shapes and builds the way we interact with accessing a computer and its peripherals. When the first electronic computers were developed after World War II, there was no such software as an operating system. The first attempt at an operating system of some kind came about a decade after the computer was born. It took another decade before the operating system became widely accepted.
 
-系统软件
+.. 今天，我们很难想象在没有操作系统的情况下使用计算机，它塑造和构建了我们访问计算机及其外围设备的交互方式。当第一批电子计算机在第二次世界大战后被开发出来时，还没有操作系统这种软件。在计算机诞生十年后，才首次出现某种操作系统的尝试。又过了十年，操作系统才被大家广泛接受。
+
+Our discussion will focus on general-purpose operating systems because they require a superset of the technologies required for embedded systems, providing a more comprehensive coverage of operating system principles, concepts, and techniques. The current general-purpose operating system is a complex system software. For example, the source code of Linux operating system has tens of millions of lines in C language. In the early stage of learning the operating system, if you analyze and understand such a large-scale software, you will have to pay a heafy price, so we simplify it and only discuss the most basic functions.
+
+.. 我们的讨论将集中在通用操作系统上，因为它们需要的技术是嵌入式系统所需技术的超集，对操作系统原理、概念和技术的覆盖更加全面。现在的通用操作系统是一个复杂的系统软件，比如 Linux 操作系统达到了千万行的 C 源码量级。在学习操作系统的初期，如果去分析了解这样大规模的软件，要付出巨大的代价，因此我们对其进行简化，只讨论最基本的功能。
+
+.. 系统软件
+
+System Software
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-系统软件是为计算机系统提供基本功能，并在计算机系统范围内使用的软件，其作用可涉及到整个计算机系统。系统软件包括操作系统内核、驱动程序、工具软件、用户界面、软件库等。操作系统内核是系统软件的核心部分，负责控制计算机的硬件资源并为用户和应用程序提供服务。驱动程序是操作系统用于控制硬件设备的软件，如显卡驱动、声卡驱动和打印机驱动等。一般情况下，驱动程序是操作系统内核的一部分。
+System software is software that provides basic functions for the computer system and is used within the scope of the computer system, and its role may involve the entire computer system. System software includes operating system kernel, driver, tool software, user interface, software library, etc. The operating system kernel is the core part of the system software, responsible for controlling the computer's hardware resources and providing services for users and applications. Drivers are software used by the operating system to control hardware devices, such as graphics card drivers, sound card drivers, and printer drivers. Typically, drivers are part of the operating system kernel.
 
-工具软件是操作系统提供的用于维护、调试和优化计算机系统的软件，如磁盘碎片整理工具、系统信息工具和病毒查杀工具等。用户界面可以是图形用户界面 (GUI) 或命令行界面 (CLI)。图形用户界面是操作系统的一种常见用户界面，它使用图形元素（如图标、菜单和按钮）来帮助用户使用操作系统。通常，图形用户界面提供了一个桌面环境，其中包含可以打开和关闭的窗口，用户可以在其中运行应用程序和执行其他操作。图形用户界面是操作系统的一种常见用户界面，它使用图形元素（如图标、菜单和按钮）来帮助用户使用操作系统。通常，图形用户界面提供了一个桌面环境，其中包含可以打开和关闭的窗口，用户可以在其中运行应用程序和执行其他操作。
+.. 系统软件是为计算机系统提供基本功能，并在计算机系统范围内使用的软件，其作用可涉及到整个计算机系统。系统软件包括操作系统内核、驱动程序、工具软件、用户界面、软件库等。操作系统内核是系统软件的核心部分，负责控制计算机的硬件资源并为用户和应用程序提供服务。驱动程序是操作系统用于控制硬件设备的软件，如显卡驱动、声卡驱动和打印机驱动等。一般情况下，驱动程序是操作系统内核的一部分。
+
+Tool software is software provided by the operating system for maintaining, debugging, and optimizing computer systems, such as disk defragmentation tools, system information tools, and virus killing tools. The user interface can be a graphical user interface (GUI) or a command line interface (CLI). A GUI is a common user interface for an operating system that uses graphical elements such as icons, menus, and buttons to help users use the operating system. Typically, a graphical user interface provides a desktop environment with windows that can be opened and closed in which the user can run applications and perform other operations. A GUI is a common user interface for an operating system that uses graphical elements such as icons, menus, and buttons to help users use the operating system. Typically, a graphical user interface provides a desktop environment with windows that can be opened and closed in which the user can run applications and perform other operations.
+
+.. 工具软件是操作系统提供的用于维护、调试和优化计算机系统的软件，如磁盘碎片整理工具、系统信息工具和病毒查杀工具等。用户界面可以是图形用户界面 (GUI) 或命令行界面 (CLI)。图形用户界面是操作系统的一种常见用户界面，它使用图形元素（如图标、菜单和按钮）来帮助用户使用操作系统。通常，图形用户界面提供了一个桌面环境，其中包含可以打开和关闭的窗口，用户可以在其中运行应用程序和执行其他操作。图形用户界面是操作系统的一种常见用户界面，它使用图形元素（如图标、菜单和按钮）来帮助用户使用操作系统。通常，图形用户界面提供了一个桌面环境，其中包含可以打开和关闭的窗口，用户可以在其中运行应用程序和执行其他操作。
 
 .. chyyuu    
    如果这样来看，编辑类软件，如 Vi、Emacs、MS Word等，只涉及到对文本文件的编辑，它们就不能算是系统软件。
 
-C 语言标准库 libc（类似的有 Rust 标准库 等）提供了与 OS 交互的系统调用接口，其功能覆盖了整个计算机系统，会被许多不同的软件访问和调用。
 
-从这个角度来看，操作系统是一种系统软件。
+The C language standard library libc (similar to the Rust standard library, etc.) provides a system call interface for interacting with the OS. Its functions cover the entire computer system and will be accessed and called by many different software.
 
-执行环境
+From this point of view, the operating system is a kind of system software.
+
+.. C 语言标准库 libc（类似的有 Rust 标准库 等）提供了与 OS 交互的系统调用接口，其功能覆盖了整个计算机系统，会被许多不同的软件访问和调用。
+
+.. 从这个角度来看，操作系统是一种系统软件。
+
+.. 执行环境
+
+Runtime Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-站在应用程序的角度来看，我们可以发现常见的应用程序其实是运行在由硬件、操作系统内核、运行时库、图形界面支持库等所包起来的一个 :ref:`执行环境 (Execution Environment) <exec-env>` 中，如下图所示。执行环境提供了运行应用软件所需的运行时服务，包括内存管理、文件系统访问、网络连接等，这些服务大部分是由操作系统来提供的。应用程序只需根据与系统软件约定好的应用程序二进制接口 (ABI, Application Binary Interface) 来请求执行环境提供的各种服务或功能，从而完成应用程序自己的功能。基于这样的观察，我们可以把操作系统的定义简化为： **应用程序的软件执行环境** 。这种概括性描述可以适用于操作系统发展的不同历史时期。从这个角度出发，操作系统可以包括运行时库、图形界面支持库等系统软件。在 :ref:`后续小节“执行环境” <term-exec-env-define>` 中会对执行环境相关含义进行进一步的阐述。
+From the perspective of applications, we can find that common applications are actually running in an :ref:`Execution Environment (Execution Environment) <exec-env>` wrapped by hardware, operating system kernel, runtime library, graphical interface support library, etc., as shown in the figure below. The execution environment provides runtime services required to run application software, including memory management, file system access, network connections, etc. Most of these services are provided by the operating system. The application program only needs to request various services or functions provided by the execution environment according to the Application Binary Interface (ABI, Application Binary Interface) agreed with the system software, so as to complete the application program's own functions. Based on this observation, we can simplify the definition of an operating system to: **A software execution environment for applications**. This general description can be applied to different historical periods of operating system development. From this point of view, the operating system can include system software such as runtime libraries and graphical interface support libraries. In :ref:`subsequent section "Execution Environment" <term-exec-env-define>`, the meaning of execution environment will be further elaborated.
+
+.. 站在应用程序的角度来看，我们可以发现常见的应用程序其实是运行在由硬件、操作系统内核、运行时库、图形界面支持库等所包起来的一个 :ref:`执行环境 (Execution Environment) <exec-env>` 中，如下图所示。执行环境提供了运行应用软件所需的运行时服务，包括内存管理、文件系统访问、网络连接等，这些服务大部分是由操作系统来提供的。应用程序只需根据与系统软件约定好的应用程序二进制接口 (ABI, Application Binary Interface) 来请求执行环境提供的各种服务或功能，从而完成应用程序自己的功能。基于这样的观察，我们可以把操作系统的定义简化为： **应用程序的软件执行环境** 。这种概括性描述可以适用于操作系统发展的不同历史时期。从这个角度出发，操作系统可以包括运行时库、图形界面支持库等系统软件。在 :ref:`后续小节“执行环境” <term-exec-env-define>` 中会对执行环境相关含义进行进一步的阐述。
 
 .. image:: EE.png
    :align: center
