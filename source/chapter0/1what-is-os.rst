@@ -83,7 +83,7 @@ s
 
 .. 如果看看我们的身边， Android 应用运行在 ARM 处理器上的 Android 操作系统执行环境中；微软的 Office 应用运行在 x86-64 处理器上的 Windows 操作系统执行环境中；Web Server应用运行在 x86-64 处理器上的 Linux 操作系统执行环境中；Web app 应用运行在 x86-64 或 ARM 处理器上的 Chrome OS 操作系统执行环境中。而在一些嵌入式环境中，操作系统以运行时库的形式与应用程序紧密结合在一起，形成一个可在嵌入式硬件上执行的嵌入式应用。所以，在不同的应用场景下，操作系统的边界也是不同的，我们可以把运行时库、图形界面支持库等这些可支持不同应用的系统软件 (System Software) 也看成是操作系统的一部分。
 
-If you look around us, Android applications run on the Android operating system execution environment on the ARM processor; Microsoft Office applications run on the Windows operating system execution environment on the x86-64 processor; Web Server applications run on the x86- Linux operating system execution environment on 64 processors; Web app application runs on Chrome OS operating system execution environment on x86-64 or ARM processors. In some embedded environments, the operating system closely works with the application program in the form of a runtime library to form an embedded application that can be executed on the embedded hardware. Therefore, in different application scenarios, the boundaries of the operating system are also different. We can regard runtime libraries, graphical interface support libraries and other system softwares that can support different applications as part of the operating system.
+If you look around, Android applications run on the Android operating system execution environment on the ARM processor; Microsoft Office applications run on the Windows operating system execution environment on the x86-64 processor; Web Server applications run on the x86 Linux operating system execution environment on 64-bit processors; Web app application runs on Chrome OS operating system execution environment on x86-64 or ARM processors. In some embedded environments, the operating system closely works with the application program in the form of a runtime library to form an embedded application that can be executed on the embedded hardware. Therefore, in different application scenarios, the boundaries of the operating system are also different. We can regard runtime libraries, graphical interface support libraries and other system softwares that can support different applications as part of the operating system.
 
 
 What are the components of the operating system? In general, the main components of an operating system include:
@@ -143,7 +143,7 @@ In fact, the connotation and extension of the operating system have been changin
 
 .. 其实，操作系统的内涵和外延随着历史的发展也一直在变化，并没有类似于“1+1=2”这样的明确定义。参考地球生物的进化史，我们也给操作系统的进化历史做一个简单的概述，从中可以看到操作系统在各个时间段上包含什么，具有什么样的特征。但无论操作系统的内在实现和具体目标如何变化，其管理计算机硬件，给应用提供服务的核心定位没有变化。
 
-Cambrian Explosion Era [#Cambrian]_
+Cambrian: Era of Explosion [#Cambrian]_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -183,7 +183,7 @@ In China, technologies related to computers and operating systems are also devel
 
 .. 泥盆纪 [#泥盆纪]_ 鱼类时代和二叠纪  [#二叠纪]_ 两栖动物时代
 
-Devonian [#Devonian]_ The age of fishes and the Permian [#Permian]_ The age of amphibians
+Devonian [#Devonian]_:  The Age of Fishes and the Permian [#Permian]_: The Age of Amphibians
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the 1950s and 1960s, computers developed to the stage of mainframes, and the computing power and I/O processing capabilities were further enhanced, the storage space was further expanded, and the application fields were gradually expanded, which made the corresponding early operating systems more diversified and specialized. Computer manufacturers design dedicated operating systems for their respective hardware, and most of them are written in assembly language. This leads to low development efficiency of the operating system, lack of portability across hardware platforms, and slow evolution. Moreover, processor time was very precious at that time, and it was a great waste to limit the use of the computer system to one user at a time. For example, in early computer systems, when a user loaded an application program through the monitor program, the processor remained idle and all other user programs could not execute. In order to improve the efficiency of computer execution, the evolution of the operating system continues, from the stage of "manual operation" and "monitoring program" to the stage of "batch processing" and "multiprogramming".
@@ -267,7 +267,7 @@ In February 1965, Professor Ci Yungui of Harbin Military Engineering Institute (
 
 .. 侏罗纪 [#侏罗纪]_ 与白垩纪 [#白垩纪]_ 的恐龙时代
 
-Jurassic [#Jurassic]_ and Cretaceous [#Cretaceous]_ the age of dinosaurs
+Jurassic [#Jurassic]_ and Cretaceous [#Cretaceous]_: the Age of Dinosaurs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In 1965, when Gordon Moore, then director of research and development at Fairchild Semiconductor Corporation, was asked to predict the future development trend of the semiconductor industry, he proposed: "When the price remains constant, the number of transistors that can be accommodated on an integrated circuit will double every year." Known as Moore's Law. In 1975, Gordon Moore's colleague David House argued that, according to Moore's Law, the performance of computer chips would also double every 18 months. This cumulative effect has led to a gradual decline in computing costs, so that software developers do not have to devote all their energy to improving processor utilization, but can start working hard to improve the user experience. For example, UNIX was developed in the early 70s on spare computers that no one was using at the time. At the end of the 1950s, time-sharing operating systems, which improved the way humans interact with computers, came to the fore. Time-sharing refers to the sharing of CPU and other hardware resources on the same computer by multiple users and programs at small intervals of time. In 1961, Fernando Corbató of the Massachusetts Institute of Technology led a team to successfully develop the CTSS (Compatible Time-Sharing System, Compatible Time-Sharing System) operating system [#UNIX25Y]_ on the IBM 709 computer, which has the necessary time-sharing system Features: Support multiple users to share and use the same computer, that is, multiple human-computer interaction tasks can be completed within the same time period macroscopically.
@@ -331,7 +331,7 @@ In 1973, Xu Jiafu from Nanjing University, Zhong Cuihao from the Software Instit
 
 .. 古近纪 [#古近纪]_ 哺乳动物时代
 
-Paleogene [#Paleogene]_ The Age of Mammals
+Paleogene [#Paleogene]_: The Age of Mammals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the middle and late 1970s, the rapid development of microprocessors made the application of computers popular to small and medium-sized enterprises and individual enthusiasts, which promoted the development of PC (Personal Computer) and further promoted the operating system for the general public. These are exeplified by the DOS operating system developed (and actually purchased) by Microsoft Corporation for personal computers in the 1980s and characterized by its simplicity and ease of use. Later, MS Windows, an operating system with a graphical user interface (GUI), was developed, which greatly simplified the difficulty for ordinary users to use computers, and made personal computers popular and widely used. It should be noted here that the first personal computer prototype with a GUI interface originated from the great but lamentable Xerox Palo Alto Research Center (PARC, Palo Alto Research Center). The graphical user interface (GUI, Graphical User Interface) with pop-up menus and overlapping windows can be manipulated by clicking the mouse, which is the basis of the GUI system we use today. Supporting a convenient graphical interface has also become one of the main features of operating systems since the 1970s. This is like the mammals of the Paleogene [#Paleogene]_, which can run on land, fly in the air and swim in water, and have strong adaptability and survivability.
@@ -355,61 +355,102 @@ Around 1980, the multi-machine real-time operating system GX-73 for the survey s
 
    .. 在哺乳动物之前已经出现了具有灵巧感知能力的生物，这就是晚侏罗纪的侏罗猎龙。它体型小巧，有着适应微光环境的大眼睛和具备压力感应能力的神奇鳞片，能够发现外部环境的微小变化，这种“小巧灵敏”的特征为后续哺乳动物的生物进化开辟了一个方向。 :ref:`第九章 <link-chapter9>` 的“侏罗猎龙”操作系统 -- “Device OS”支持与新增的键盘、鼠标、GPU 等多种 Virtio 外设的交互，可以形成初级的人机交互 GUI 能力，而且支持在内核中响应中断来降低 I/O 响应的总体延迟。这在某种程度上体现了当前广泛使用的有图形界面的桌面/移动终端操作系统的基本特征。
 
-第四纪智人时代 [#人类简史]_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. 第四纪智人时代 [#人类简史]_
 
-21 世纪以来， Internet 和移动互联网的迅猛发展，使得在服务器领域和个人终端的应用与需求大增，数据中心和个人终端已经进入了人们的日常生活中。现在我们拥有种类繁多的计算设备，在这些设备上运行着许多不同的操作系统，操作系统设计者面临的功能权衡取决于硬件的物理能力以及应用程序和用户需求。下面是一些目前常见类型的操作系统：
+Quaternary: The Age of Homo Sapiens [#HumanBriefHistory]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- 面向服务器的操作系统：当前大家常用的主流搜索引擎、新媒体、电子商务网站和大数据处理系统等一般都托管在数据中心的计算机上。每台计算机都是强大的服务器，运行着服务器操作系统，典型的例子是 Linux。通常每台服务器只运行一个应用服务程序，例如数据库服务器或 Web 服务器等，用于处理成千上万个用户传入的网络服务请求，所以吞吐量（每秒处理的请求数量）是一个关键的优化目标。而安全和可靠也是服务器操作性系统需要重点关注的目标。服务器操作系统的一种形态是虚拟机（Virtual Machine Monitor，VMM），它可在一台物理机上虚拟出多台虚拟计算机，可以像运行应用程序一样运行另一个操作系统。通过虚拟机可以充分利用数据中心中资源利用率不高的物理服务器，提高整个数据中心的运行效率。典型的服务器操作系统有：FreeBSD、微软的Windows Server、基于 Linux 系的 RHLS、Ubuntu、openEuler、龙蜥操作系统、麒麟服务器操作系统等。
+Since the 21st century, the rapid development of the Internet and mobile Internet has greatly increased the application and demand in the field of servers and personal terminals. Data centers and personal terminals have entered people's daily life. We now have a wide variety of computing devices with many different operating systems running on them, and the functional trade-offs facing OS designers depend on the capabilities of the hardware as well as application and user needs. Here are some common types of operating systems today:
 
-- 面向台式机/笔记本电脑和上网本的操作系统：典型的例子是：Windows、Mac OS X、Linux、Chrome OS等。这些操作系统主要面向单个用户，运行许多应用程序，并具有各种 I/O 设备。有人可能认为只有一个用户，就没有必要将系统设计为支持多用户共享，这会使得操作系统设计更加简单，但安全性相对弱一些。
+.. 21 世纪以来， Internet 和移动互联网的迅猛发展，使得在服务器领域和个人终端的应用与需求大增，数据中心和个人终端已经进入了人们的日常生活中。现在我们拥有种类繁多的计算设备，在这些设备上运行着许多不同的操作系统，操作系统设计者面临的功能权衡取决于硬件的物理能力以及应用程序和用户需求。下面是一些目前常见类型的操作系统：
 
-- 面向智能移动终端（手机/平板）的操作系统：智能移动终端是一种带有强大处理器的手机或平板，能够运行第三方应用程序。智能移动终端操作系统的典型例子包括 两个霸主 iOS、Android，和曾经辉煌过的 Symbian，还有几乎快消失的 WebOS、Blackberry OS 和 Windows Phone 等。智能移动终端一般只有一个用户，对交互响应能力、长效的电池使用时间和各种应用的支持有着迫切的需求。
+- Operating system for servers: Currently, mainstream search engines, new media, e-commerce websites, and big data processing systems that are commonly used by everyone are generally hosted on computers in data centers. Every computer is a powerful server, running a server operating system, typically Linux. Usually each server only runs one application service program, such as a database server or a Web server, etc., to handle incoming network service requests from thousands of users, so throughput (the number of requests processed per second) is a key optimization target. Security and reliability are also the goals that server operating systems pursue. One form of server operating system is a virtual machine (Virtual Machine Monitor, VMM), which can virtualize multiple virtual computers on a physical machine, and can run another operating system like an application. Virtual machines can make full use of physical servers with low resource utilization in the data center to improve the operating efficiency of the entire data center. Typical server operating systems include: FreeBSD, Microsoft Windows Server, RHLS based on Linux, Ubuntu, openEuler, Dragon Lizard operating system, Kirin server operating system, etc.
 
-- 嵌入式操作系统：随着物联网的发展，处理器芯片可以集成到各种的消费设备中，从机顶盒、手表到机器人等，形成各种物联网中的嵌入式设备。这些嵌入式设备的功能相对单一，通常运行嵌入式操作系统。典型的嵌入式操作系统有 嵌入式 Linux、VxWorks、FreeRTOS、RT-Thread、SylixOS 等。预计在下一个十年，通过面向物联网设备的操作系统，可以把各种嵌入式设备连接在一起，实现灵活多变的功能协同与组合，形成万物互联的新应用场景和生态。
+.. - 面向服务器的操作系统：当前大家常用的主流搜索引擎、新媒体、电子商务网站和大数据处理系统等一般都托管在数据中心的计算机上。每台计算机都是强大的服务器，运行着服务器操作系统，典型的例子是 Linux。通常每台服务器只运行一个应用服务程序，例如数据库服务器或 Web 服务器等，用于处理成千上万个用户传入的网络服务请求，所以吞吐量（每秒处理的请求数量）是一个关键的优化目标。而安全和可靠也是服务器操作性系统需要重点关注的目标。服务器操作系统的一种形态是虚拟机（Virtual Machine Monitor，VMM），它可在一台物理机上虚拟出多台虚拟计算机，可以像运行应用程序一样运行另一个操作系统。通过虚拟机可以充分利用数据中心中资源利用率不高的物理服务器，提高整个数据中心的运行效率。典型的服务器操作系统有：FreeBSD、微软的Windows Server、基于 Linux 系的 RHLS、Ubuntu、openEuler、龙蜥操作系统、麒麟服务器操作系统等。
 
-从上面的简介，我们可以看到，iOS 和 Android 操作系统是 21 世纪个人终端操作系统的代表，Linux 在巨型机到数据中心服务器操作系统中占据了统治地位。以 Android 系统为例，Android 操作系统是一个包括 Linux 操作系统内核、基于 Java 的中间件、用户界面和关键应用软件的移动设备软件栈集合。这里介绍一下广泛用在服务器领域、智能移动终端和嵌入式系统中的操作系统内核--Linux 操作系统内核。1991 年 8 月，芬兰学生 Linus Torvalds \(林纳斯·托瓦兹\) 在 comp.os.minix 新闻组贴上了以下这段话： 
+- Operating systems for desktops/laptops and netbooks: Typical examples are: Windows, Mac OS X, Linux, Chrome OS, etc. These operating systems are primarily intended for a single user, run many applications, and have various I/O devices. Some people may think that there is only one user, so there is no need to design the system to support multi-user sharing, which will make the operating system design simpler, but the security is relatively weak.
 
+.. - 面向台式机/笔记本电脑和上网本的操作系统：典型的例子是：Windows、Mac OS X、Linux、Chrome OS等。这些操作系统主要面向单个用户，运行许多应用程序，并具有各种 I/O 设备。有人可能认为只有一个用户，就没有必要将系统设计为支持多用户共享，这会使得操作系统设计更加简单，但安全性相对弱一些。
+
+- Operating system for smart mobile terminals (phones/tablets): A smart mobile terminal is a mobile phone or tablet with a powerful processor capable of running third-party applications. Typical examples of smart mobile terminal operating systems include the two overlords iOS, Android, and the once brilliant Symbian, as well as the nearly disappearing WebOS, Blackberry OS, and Windows Phone. Smart mobile terminals generally have only one user, and there is an pressing need for interactive responsiveness, long-lasting battery life, and support for various applications.
+
+.. - 面向智能移动终端（手机/平板）的操作系统：智能移动终端是一种带有强大处理器的手机或平板，能够运行第三方应用程序。智能移动终端操作系统的典型例子包括 两个霸主 iOS、Android，和曾经辉煌过的 Symbian，还有几乎快消失的 WebOS、Blackberry OS 和 Windows Phone 等。智能移动终端一般只有一个用户，对交互响应能力、长效的电池使用时间和各种应用的支持有着迫切的需求。
+
+- Embedded operating system: With the development of the Internet of Things, processor chips can be integrated into various consumer devices, from set-top boxes, watches to robots, etc., which are various embedded devices in the Internet of Things. The functions of these embedded devices are relatively single, and usually run an embedded operating system. Typical embedded operating systems include embedded Linux, VxWorks, FreeRTOS, RT-Thread, SylixOS, etc. It is estimated that in the next ten years, through the operating system for IoT devices, various embedded devices can be connected together to achieve flexible and changeable function collaboration and combination, forming a new application scenario and ecology of the Internet of Everything.
+
+.. - 嵌入式操作系统：随着物联网的发展，处理器芯片可以集成到各种的消费设备中，从机顶盒、手表到机器人等，形成各种物联网中的嵌入式设备。这些嵌入式设备的功能相对单一，通常运行嵌入式操作系统。典型的嵌入式操作系统有 嵌入式 Linux、VxWorks、FreeRTOS、RT-Thread、SylixOS 等。预计在下一个十年，通过面向物联网设备的操作系统，可以把各种嵌入式设备连接在一起，实现灵活多变的功能协同与组合，形成万物互联的新应用场景和生态。
+
+From the above introduction, we can see that iOS and Android operating systems are the representatives of personal terminal operating systems in the 21st century, and Linux occupies a dominant position in operating systems from supercomputers to data center servers. Taking the Android system as an example, the Android operating system is a collection of mobile device software stacks including the Linux operating system kernel, Java-based middleware, user interface, and key application software. Here is an introduction to the operating system kernel widely used in the server field, smart mobile terminals and embedded systems - the Linux operating system kernel. In August 1991, Finnish student Linus Torvalds \(Linus Torvalds\) posted the following passage on the comp.os.minix newsgroup:
+
+  "Hello everybody out there using minix - I'm doing a (free) operating system (just a hobby, won't be big and professional like gnu) for 386(486) AT clones "
+
+.. 从上面的简介，我们可以看到，iOS 和 Android 操作系统是 21 世纪个人终端操作系统的代表，Linux 在巨型机到数据中心服务器操作系统中占据了统治地位。以 Android 系统为例，Android 操作系统是一个包括 Linux 操作系统内核、基于 Java 的中间件、用户界面和关键应用软件的移动设备软件栈集合。这里介绍一下广泛用在服务器领域、智能移动终端和嵌入式系统中的操作系统内核--Linux 操作系统内核。1991 年 8 月，芬兰学生 Linus Torvalds \(林纳斯·托瓦兹\) 在 comp.os.minix 新闻组贴上了以下这段话： 
 
   ＂你好，所有使用 minix 的人 -我正在为 386 ( 486 ) AT 做一个免费的操作系统（只是为了爱好）...″
 
 
-而他所说的“爱好″成为了大家都知道的 Linux 操作系统内核。这个时代的操作系统的特征是联网，提高网络的吞吐量，并降低传输延迟是这个时代的网络操作系统追求的目标。 Linux 就像是第四纪出现的智人，横扫陆地上的各种强大生物，出现在生物界的顶端，统治了整个地球。
+And what he called a "hobby" became known as the Linux operating system kernel. The operating system of this era is characterized by networking, the enhanced throughput of the network and the reduced transmission delay. Linux is like Homo sapiens that emerged in the Quaternary, sweeping all kinds of powerful creatures on the land, appearing at the top of the biological world, and ruling the entire earth.
+
+.. 而他所说的“爱好″成为了大家都知道的 Linux 操作系统内核。这个时代的操作系统的特征是联网，提高网络的吞吐量，并降低传输延迟是这个时代的网络操作系统追求的目标。 Linux 就像是第四纪出现的智人，横扫陆地上的各种强大生物，出现在生物界的顶端，统治了整个地球。
 
 
 .. chyyuu  https://www.163.com/dy/article/FIIMV82I0538KQKE.html https://blog.csdn.net/itmaster/article/details/27901
 
-中国对 Linux 系统的引进源于在芬兰读博士的宫敏。1994 年，他回国休假，随手带了 20 张磁盘、存储了 80GB 的自由软件，其中就有 Linux。由于 Linux 基于 GPL 协议开放源代码， Linux 在国内的高校中被小范围传播。从 1999 年起，国内出现了很多基于 Linux 的操作系统公司，出现了Xteam、蓝点、中科红旗、银河麒麟、中软 Linux 等几十种发行版。但这些发行版大多数基于 Fedora/CentOS/Debian/Ubuntu 进行二次开发，并没有形成桌面计算机的应用生态，在二十年左右的时间内，大部分发行版都退出了。目前（2019 年之后）在桌面计算机领域，麒麟操作系统和统信 UOS 操作系统目前有比较好的应用发展趋势。在服务器领域，华为的 openEuler 操作系统和阿里的龙蜥操作系统借助于云计算的快速发展，形成了较好的云应用生态。在嵌入式操作系统领域，国内有不少有技术特色的操作系统，主要代表是 RT-Thread、SylixOS、LiteOS 等。
+China's introduction of the Linux system originated from Gong Min, who was studying for a Ph.D. in Finland. In 1994, when he returned to China for vacation, he brought 20 disks with him, storing 80GB of free software, including Linux. Because Linux is open source based on the GPL agreement, Linux has been spread in a small range in domestic universities. Since 1999, many Linux-based operating system companies have emerged in China, and dozens of distributions such as Xteam, Blue Point, Zhongke Hongqi, Galaxy Kirin, and Chinasoft Linux have emerged. However, most of these distributions are based on Fedora/CentOS/Debian/Ubuntu for secondary development, and have not established an application ecosystem for desktop computers. In about two decades, most distributions have withdrawn. At present (after 2019), in the field of desktop computers, Kirin operating system and Tongxin UOS operating system currently have a relatively good application development trend. In the server field, Huawei's openEuler operating system and Alibaba's Dragon Lizard operating system have formed a good cloud application ecology with the help of the rapid development of cloud computing. In the field of embedded operating systems, there are many operating systems with technical characteristics in China, the main representatives are RT-Thread, SylixOS, LiteOS and so on.
+
+.. 中国对 Linux 系统的引进源于在芬兰读博士的宫敏。1994 年，他回国休假，随手带了 20 张磁盘、存储了 80GB 的自由软件，其中就有 Linux。由于 Linux 基于 GPL 协议开放源代码， Linux 在国内的高校中被小范围传播。从 1999 年起，国内出现了很多基于 Linux 的操作系统公司，出现了Xteam、蓝点、中科红旗、银河麒麟、中软 Linux 等几十种发行版。但这些发行版大多数基于 Fedora/CentOS/Debian/Ubuntu 进行二次开发，并没有形成桌面计算机的应用生态，在二十年左右的时间内，大部分发行版都退出了。目前（2019 年之后）在桌面计算机领域，麒麟操作系统和统信 UOS 操作系统目前有比较好的应用发展趋势。在服务器领域，华为的 openEuler 操作系统和阿里的龙蜥操作系统借助于云计算的快速发展，形成了较好的云应用生态。在嵌入式操作系统领域，国内有不少有技术特色的操作系统，主要代表是 RT-Thread、SylixOS、LiteOS 等。
 
 .. chyyuu note::
 
-   目前支持联网的操作系统设计实现在本书中还没有对应的章节。但其操作系统的内核其实与分时操作系统的设计实现思路基本是一致的。在本书设计的简单分时操作系统的基础上，添加一个网卡外设的驱动和一个简单的网络协议栈，也许是另一个有趣的操作系统实验内容。
+   At present, there is no corresponding chapter in this book for the design and implementation of an operating system that supports networking. However, the kernel of its operating system is basically consistent with the design and implementation of the time-sharing operating system. On the basis of the simple time-sharing operating system designed in this book, adding a network card peripheral driver and a simple network protocol stack may be another interesting operating system experiment content.
 
-二十一世纪神人时代 [#未来简史]_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. 目前支持联网的操作系统设计实现在本书中还没有对应的章节。但其操作系统的内核其实与分时操作系统的设计实现思路基本是一致的。在本书设计的简单分时操作系统的基础上，添加一个网卡外设的驱动和一个简单的网络协议栈，也许是另一个有趣的操作系统实验内容。
 
-当前，大数据、人工智能、机器学习、高速移动互联网络、AR/VR 对操作系统等系统软件带来了新的挑战。如何有效支持和利用这些技术是未来操作系统的方向。我们看到了华为逐步推出的 OpenHarmony 系统；小米也推出了物联网软件平台小米 Vela ；阿里推出了 AliOS Thing；腾讯推出了Tencent OS；苹果公司接连推出 A14、M1 等基于 ARM 的 CPU，逐步开始淘汰 X86 CPU；微软推出 Windows 10 IoT，Google 推出 Fuchsia OS。大家都在做着各种位于云、边、端操作系统的技术调整和创新，构建多种形态的网络基础设施。可以发现操作系统的外延在放大，位于云、边、端的操作系统通过多种形态的网络基础设施，跳出了传统单机为主的运行模式，支持应用程序在分布式环境下的互联、互通以及互操作，从而进一步延伸为分布式操作系统。
+.. 二十一世纪神人时代 [#未来简史]_
+
+The 21st Century: The Age of Gods [#FutureBriefHistory]_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+At present, big data, artificial intelligence, machine learning, high-speed mobile Internet, and AR/VR have brought new challenges to system software such as operating systems. How to effectively support and utilize these technologies is the direction of the future operating system. We have seen the OpenHarmony system gradually launched by Huawei; Xiaomi also launched the IoT software platform Xiaomi Vela; Ali launched AliOS Thing; Tencent launched Tencent OS; CPU; Microsoft launched Windows 10 IoT, Google launched Fuchsia OS. Everyone is making various technical adjustments and innovations in cloud, edge, and end operating systems, and building various forms of network infrastructure. It can be found that the extension of the operating system is expanding. The operating system located in the cloud, edge, and end uses various forms of network infrastructure to jump out of the traditional stand-alone-based operation mode and support the interconnection, intercommunication, and interoperability of applications in a distributed environment, further extending a distributed operating system.
 
 
-另外，随着人工智能和机器学习的快速发展，下一个与人工智能充分融合并带有分布式特征的操作系统即将到来，并试图通过这种操作系统带来的连贯用户体验，打通从数据中心、服务器、桌面、移动端、边缘设备等的整个 AI 和物联网 (IoT, Internet of Things) 的生态。也许这种未来操作系统与之前的操作系统相比，其最大的不同是具有了人工智能的属性，跳出了单个设备节点，通过多种网络从不同维度来管理多个设备。这种操作系统也许就是尤瓦尔·赫拉利所著的《未来简史》 [#未来简史]_ 中描述的“无所不能”的神人操作系统。
+.. 当前，大数据、人工智能、机器学习、高速移动互联网络、AR/VR 对操作系统等系统软件带来了新的挑战。如何有效支持和利用这些技术是未来操作系统的方向。我们看到了华为逐步推出的 OpenHarmony 系统；小米也推出了物联网软件平台小米 Vela ；阿里推出了 AliOS Thing；腾讯推出了Tencent OS；苹果公司接连推出 A14、M1 等基于 ARM 的 CPU，逐步开始淘汰 X86 CPU；微软推出 Windows 10 IoT，Google 推出 Fuchsia OS。大家都在做着各种位于云、边、端操作系统的技术调整和创新，构建多种形态的网络基础设施。可以发现操作系统的外延在放大，位于云、边、端的操作系统通过多种形态的网络基础设施，跳出了传统单机为主的运行模式，支持应用程序在分布式环境下的互联、互通以及互操作，从而进一步延伸为分布式操作系统。
 
-目前支持 AIoT 的操作系统设计实现在本书中还没有对应的章节，不过我们的同学也设计了 `zCore操作系统 <https://github.com/rcore-os/zCore>`_ ，欢迎看完本书的同学能够尝试参与或独立设计面向未来的操作系统。
+In addition, with the rapid development of artificial intelligence and machine learning, the next operating system that is fully integrated with artificial intelligence and has distributed features is coming, and it is trying to use the coherent user experience brought by this operating system to connect data center , servers, desktops, mobile terminals, edge devices, etc., the entire AI and Internet of Things (IoT, Internet of Things) ecosystem. Perhaps the biggest difference between this future operating system and the previous operating system is that it has the attribute of artificial intelligence. It jumps out of a single device node, and managing multiple devices from different dimensions through multiple networks. This operating system may be the "omnipotent" god-man operating system described in Yuval Harari's "A Brief History of the Future" [#FutureBriefHistory]_.
 
+.. 另外，随着人工智能和机器学习的快速发展，下一个与人工智能充分融合并带有分布式特征的操作系统即将到来，并试图通过这种操作系统带来的连贯用户体验，打通从数据中心、服务器、桌面、移动端、边缘设备等的整个 AI 和物联网 (IoT, Internet of Things) 的生态。也许这种未来操作系统与之前的操作系统相比，其最大的不同是具有了人工智能的属性，跳出了单个设备节点，通过多种网络从不同维度来管理多个设备。这种操作系统也许就是尤瓦尔·赫拉利所著的《未来简史》 [#未来简史]_ 中描述的“无所不能”的神人操作系统。
+
+At present, there is no corresponding chapter in this book for the design and implementation of the operating system that supports AIoT, but our classmates also designed the `zCore operating system <https://github.com/rcore-os/zCore>`_. Welcome students after reading this book to try to participate in or independently design a future-oriented operating system.
+
+.. 目前支持 AIoT 的操作系统设计实现在本书中还没有对应的章节，不过我们的同学也设计了 `zCore操作系统 <https://github.com/rcore-os/zCore>`_ ，欢迎看完本书的同学能够尝试参与或独立设计面向未来的操作系统。
  
 .. chyyuu https://www.sohu.com/a/323094413_783821 https://it.sohu.com/20050117/n223974639.shtml  https://www.museum.uestc.edu.cn/info/1184/2337.htm
 
 
-
-
-.. [#Cambrian] 5亿年前的寒武纪期间生物种类突然丰富起来，呈爆炸式的增加，期间的典型生物是三叶虫。
-.. [#Devonian] 4亿年前的泥盆纪期间鱼类空前繁荣，并在晚期出现了两栖动物。
-.. [#Permian] 3亿年前的二叠纪期间是一个承上启下的阶段，两栖类动物最繁盛，爬行动物逐渐繁荣。 
-.. [#Jurassic] 2亿年前的侏罗纪期间温暖潮湿，爬行类动物的代表--恐龙成为当时的统治者，哺乳动物开始发展。
-.. [#Cretaceous] 1亿年前的白垩纪期间温暖干旱，恐龙经历了从鼎盛到灭绝的巨大变化，哺乳动物兴起。
-.. [#Paleogene] 0.6亿年前的古近纪时期，哺乳动物迅速发展，且形态多样化，逐渐统治了地面。
-.. [#人类简史] 尤瓦尔·赫拉利所著的“人类简史” 书中提到的智人遍布地球，可类比现在的Linux 。
-.. [#未来简史] 尤瓦尔·赫拉利所著的“未来简史” 书中描述的神人可类比于未来支持AI的分布式操作系统 。
+.. [#Cambrian] During the Cambrian period 500 million years ago, the species of organisms suddenly became abundant explosively. The typical organisms during this period were trilobites. 
+.. [#Devonian] During the Devonian period 400 million years ago, fish flourished unprecedentedly, and amphibians appeared in the late period.
+.. [#Permian] The Permian period 300 million years ago was a transition period between the preceding and the following. Amphibians were the most prosperous, and reptiles gradually prospered.
+.. [#Jurassic] During the Jurassic period 200 million years ago, it was warm and humid, the representatives of reptiles - dinosaurs became the rulers at that time, and mammals began to flourish.
+.. [#Cretaceous] During the Cretaceous period 100 million years ago, it was warm and dry, dinosaurs experienced great changes from their heyday to extinction, and mammals emerged.
+.. [#Paleogene] During the Paleogene period 60 million years ago, mammals developed rapidly and diversified in form, gradually dominating the land.
+.. [#HumanBriefHistory] The homo sapiens mentioned in the book "A Brief History of Humanity" written by Yuval Harari are all over the earth, comparable to the current Linux.
+.. [#FutureBriefHistory] The god-man described in Yuval Harari's "A Brief History of the Future" can be compared to the distributed operating system supporting AI in the future.
 .. [#UNIX25Y] Peter H.Salus, A Quarter Century of UNIX, Addison-Wesley Publishing, 1997
 .. [#UNIX] Brain W. Kernighan, UNIX: A History and a Memoir, Independently published, 2020 
 .. [#OSHISTORY] Maarten Bullynck, What is an Operating System? A historical investigation (1954–1964), https://halshs.archives-ouvertes.fr/halshs-01541602/document
-.. [#MAN] 布鲁克斯(Brooks, F. P.), 人月神话(40周年中文纪念版),2015
+.. [#MAN] Brooks, F. P., The Mythical Man-Month (Chinese Commemorative Edition for the 40th Anniversary), 2015
+
+
+..
+   [#Cambrian] 5亿年前的寒武纪期间生物种类突然丰富起来，呈爆炸式的增加，期间的典型生物是三叶虫。
+   [#Devonian] 4亿年前的泥盆纪期间鱼类空前繁荣，并在晚期出现了两栖动物。
+   [#Permian] 3亿年前的二叠纪期间是一个承上启下的阶段，两栖类动物最繁盛，爬行动物逐渐繁荣。 
+   [#Jurassic] 2亿年前的侏罗纪期间温暖潮湿，爬行类动物的代表--恐龙成为当时的统治者，哺乳动物开始发展。
+   [#Cretaceous] 1亿年前的白垩纪期间温暖干旱，恐龙经历了从鼎盛到灭绝的巨大变化，哺乳动物兴起。
+   [#Paleogene] 0.6亿年前的古近纪时期，哺乳动物迅速发展，且形态多样化，逐渐统治了地面。
+   [#人类简史] 尤瓦尔·赫拉利所著的“人类简史” 书中提到的智人遍布地球，可类比现在的Linux 。
+   [#未来简史] 尤瓦尔·赫拉利所著的“未来简史” 书中描述的神人可类比于未来支持AI的分布式操作系统 。
+   [#UNIX25Y] Peter H.Salus, A Quarter Century of UNIX, Addison-Wesley Publishing, 1997
+   [#UNIX] Brain W. Kernighan, UNIX: A History and a Memoir, Independently published, 2020 
+   [#OSHISTORY] Maarten Bullynck, What is an Operating System? A historical investigation (1954–1964), https://halshs.archives-ouvertes.fr/halshs-01541602/document
+   [#MAN] 布鲁克斯(Brooks, F. P.), 人月神话(40周年中文纪念版),2015
