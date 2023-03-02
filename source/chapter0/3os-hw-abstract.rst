@@ -1,4 +1,6 @@
-操作系统抽象
+.. 操作系统抽象
+
+Operating System Abstraction
 ================================================
 
 .. toctree::
@@ -10,11 +12,17 @@
   chyyuu：我觉得需要给出执行环境（EE），Task，...，上下文（函数，trap,task，进程...），执行流等的描述。
   并且有一个图，展示这些概念的关系。这些概念能够有链接，指向进一步实际定义或使用的地方。
 
-接下来同学可站在操作系统实现的角度来看操作系统。操作系统为了能够更好地管理计算机系统并为应用程序提供便捷的服务，在计算机和操作系统的技术研究和发展的过程中，形成了一系列的核心（抽象）概念：执行环境、进程、地址空间和文件，这些奠定了操作系统内核设计与实现的基础。
+.. 接下来同学可站在操作系统实现的角度来看操作系统。操作系统为了能够更好地管理计算机系统并为应用程序提供便捷的服务，在计算机和操作系统的技术研究和发展的过程中，形成了一系列的核心（抽象）概念：执行环境、进程、地址空间和文件，这些奠定了操作系统内核设计与实现的基础。
+
+Next, students can look at the operating system from the perspective of operating system implementation. In order to better manage computer systems and provide convenient services for applications, the operating system has formed a series of core (abstract) concepts in the process of computer and operating system technology research and development: execution environment, process, address space and files, which lay the foundation for the design and implementation of the operating system kernel.
+
 
 .. note::
 
-   在本书中，关于执行环境、进程、地址空间和文件的抽象表示不会仅仅就是一个文字描述，还会在后续章节关于具体操作系统设计与运行的讲述中，以具体化的静态数据结构、动态执行导致计算机中物理/虚拟资源的改变来展示。从而让同学能够建立操作系统抽象概念与操作系统具体实现之间的内在联系。
+   .. 在本书中，关于执行环境、进程、地址空间和文件的抽象表示不会仅仅就是一个文字描述，还会在后续章节关于具体操作系统设计与运行的讲述中，以具体化的静态数据结构、动态执行导致计算机中物理/虚拟资源的改变来展示。从而让同学能够建立操作系统抽象概念与操作系统具体实现之间的内在联系。
+
+   In this book, the abstract representation of the execution environment, process, address space, and file will not be just a text description, but will also be demonstrated in the following chapters by concrete static data structure, dynamic execution (which transforms physical/virtual computer state). So that students can establish the inner connection between the abstract concept of the operating system and its specific implementation.
+
 
 .. _term-exec-env-define:
 
