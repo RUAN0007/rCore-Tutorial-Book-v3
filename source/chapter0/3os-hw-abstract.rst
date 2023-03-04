@@ -40,7 +40,7 @@ Execution Environment
    :name: basic-ee
 
 
-Further, the operating system replaces the function library to access the hardware, and the function library further provides rich functions and resources to the application program by accessing the system call service of the operating system. In the third stage, the execution environment of the application becomes *function library* -> *operating system kernel* -> *computer hardware*. Later, Java-based applications appeared. Between the function library and the operating system, there is an additional layer of Java virtual machine. At this time, the execution environment of the Java application becomes *function library* -> *Java virtual Machine* -> *OS Kernel* -> *Computer Hardware*. In the era of cloud computing, there is an additional layer of Hypervisor/VMM between the traditional operating system and computer hardware. At this time, the execution environment of the application becomes *function library* -> *Java virtual machine* -> *operating system kernel* -> *Hypervisor/VMM* -> *Computer Hardware*. It can be seen here that with the diversification and complexity of software requirements, there are more and more levels of **execution environments**.
+Further, the operating system replaces the function library to access the hardware, and the function library further provides rich functions and resources to the application program by accessing the system call service of the operating system. In the third stage, the execution environment of the application becomes *function library* -> *operating system kernel* -> *computer hardware*. Later, Java-based applications appeared. Between the function library and the operating system, there is an additional layer of Java virtual machine. At this time, the execution environment of the Java application becomes *function library* -> *Java virtual Machine* -> *OS Kernel* -> *Computer Hardware*. In the era of cloud computing, there is an additional layer of Hypervisor/VMM between the traditional operating system and computer hardware. At this time, the execution environment of the application becomes *function library* -> *Java virtual machine* -> *operating system kernel* -> *Hypervisor/VMM* -> *Computer Hardware*. It can be seen here that with the diversification and complexity of software requirements, there are a growing number of **execution environments** levels.
 
 .. 再进一步，操作系统取代了函数库来访问硬件，函数库通过访问操作系统的系统调用服务来进一步给应用程序提供丰富的功能和资源。在第三个阶段，应用程序的执行环境就变成了 *函数库* -> *操作系统内核* -> *计算机硬件* 。在后面又出现了基于 Java 语言的应用程序，在函数库和操作系统之间，多了一层 Java 虚拟机，此时 Java 应用程序的执行环境就变成了 *函数库* -> *Java 虚拟机* -> *操作系统内核* -> *计算机硬件* 。在云计算时代，在传统操作系统与计算机硬件之间多了一层 Hypervisor/VMM ，此时应用程序的执行环境变成了 *函数库* -> *Java 虚拟机* -> *操作系统内核* -> *Hypervisor/VMM* -> *计算机硬件* 。这里可以看到，随着软件需求的多样化和复杂化， **执行环境的层次** 也越来越多。
 
@@ -76,10 +76,9 @@ Based on the above introduction, we can give a basic definition of the execution
 Normal Control Flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An application performs its functions in the execution environment. But how to perform depends on the **program's flow of control**. Lets recall the knowledge in the course of Compiler Technology: the control flow of a program refers to the execution sequence in units of instructions, statements or basic blocks of a program. Recall the knowledge in the course of Computer Architecture: the control flow of the processor refers to the control transfer sequence of the program counter of a processor. The simplest kind of control flow (provided no exceptions or interrupts) is a "smooth" sequence in which the addresses of the instructions to be executed are contiguous in memory. If you look at the control flow from the perspective of a programmer, you will find that the control flow is the execution sequence of a program written by a programmer, and these sequences are preset by the programmer. When the program is running, it can execute the source code line by line (from the perspective of programming language level) by combining a variety of simple control flows (sequence, branch, loop structure, and multi-layer nested function calls), equivalent to execute assembly instructions line by line (from an assembly language-level perspective). For the different descriptions above, we can collectively call them **Common Control Flow** (CCF, Common Control Flow, referred to as Control Flow). From the perspective of the application program, it can only touch the execution environment where it is located, and will not jump to other execution environments, so the execution of the application program basically completes the entire running process in the form of ordinary control flow.
+An application performs its functions in the execution environment. But how to perform depends on the **program's flow of control**. Lets recall the knowledge in the course of Compiler Technology: the control flow of a program refers to the execution sequence in units of instructions, statements or basic blocks of a program. Recall the knowledge in the course of Computer Architecture: the control flow of the processor refers to the control transfer sequence of the program counter of a processor. The simplest kind of control flow (provided no exceptions or interrupts) is a "smooth" sequence in which the addresses of the instructions to be executed are contiguous in memory. If you look at the control flow from the perspective of a programmer, you will find that the control flow is the execution sequence of a program written by a programmer, and these sequences are preset by the programmer. When the program is running, it can execute the source code line by line (from the perspective of programming language level) by combining a variety of simple control flows (sequence, branch, loop structure, and multi-layer nested function calls), equivalent to execute assembly instructions line by line (from an assembly language-level perspective). For the different descriptions above, we can collectively call them **Common Control Flow** (CCF, Common Control Flow, referred to as Control Flow). From the perspective of the application program, it can only touch the execution environment where it is located, and will not jump to other execution environments, so the execution of the application program basically completes the entire running process in the form of normal control flow.
 
-
-各种应用程序在执行环境中执行其功能，而具体如何执行，取决于 **程序的控制流** 。回顾一下编译原理课上的知识，程序的控制流 (Flow of Control or Control Flow) 是指以一个程序的指令、语句或基本块为单位的执行序列。再回顾一下计算机组成原理课上的知识，处理器的控制流是指处理器中程序计数器的控制转移序列。最简单的一种控制流（没有异常或中断产生的前提下）是一个“平滑的”序列，其中每个要执行的指令地址在内存中都是相邻的。如果站在程序员的角度来看控制流，会发现控制流是程序员编写的程序的执行序列，这些序列是程序员预设好的。程序运行时能以多种简单的控制流（顺序、分支、循环结构和多层嵌套函数调用）组合的方式，来一行一行的执行源代码（以编程语言级的视角），也是一条一条的执行汇编指令（以汇编语言级的视角）。对于上述的不同描述，我们可以统称其为 **普通控制流** (CCF，Common Control Flow，简称 控制流) 。在应用程序视角下，它只能接触到它所在的执行环境，不会跳到其他执行环境，所以应用程序执行基本上是以普通控制流的形式完成整个运行的过程。
+.. 各种应用程序在执行环境中执行其功能，而具体如何执行，取决于 **程序的控制流** 。回顾一下编译原理课上的知识，程序的控制流 (Flow of Control or Control Flow) 是指以一个程序的指令、语句或基本块为单位的执行序列。再回顾一下计算机组成原理课上的知识，处理器的控制流是指处理器中程序计数器的控制转移序列。最简单的一种控制流（没有异常或中断产生的前提下）是一个“平滑的”序列，其中每个要执行的指令地址在内存中都是相邻的。如果站在程序员的角度来看控制流，会发现控制流是程序员编写的程序的执行序列，这些序列是程序员预设好的。程序运行时能以多种简单的控制流（顺序、分支、循环结构和多层嵌套函数调用）组合的方式，来一行一行的执行源代码（以编程语言级的视角），也是一条一条的执行汇编指令（以汇编语言级的视角）。对于上述的不同描述，我们可以统称其为 **普通控制流** (CCF，Common Control Flow，简称 控制流) 。在应用程序视角下，它只能接触到它所在的执行环境，不会跳到其他执行环境，所以应用程序执行基本上是以普通控制流的形式完成整个运行的过程。
 
 .. _term-ecf:
 
@@ -133,7 +132,7 @@ Here we refer to the physical resource state of a control flow, immediately afte
 
 .. 这里我们把控制流在执行完某指令时的物理资源内容，即确保下一时刻能继续 *正确* 执行控制流指令的物理资源内容称为控制流的 **上下文** (Context) ，也可称为控制流所在执行环境的状态。
 
-The context of the control flow here refers to the limited physical/virtual resource state that only affects the correct execution of the control flow. This requires an understanding of how the context of control flow in a program affects the *correct* execution of the program. If at some point, due to some intentional or unintentional reason, the context of the control flow changes (such as the value of a register changes), but not due to the instructions of the program's control flow itself. This will make the execution of the subsequent program instructions deviates, and eventually the execution process or execution results fail to meet expectations. This situation is called **Program Execution Error**. It is the operating system's responsibility to protect the context of the control flow in the application so that the application can execute correctly.
+The context of the control flow here refers to the only physical/virtual resource state that only affects the correct execution of the control flow. This requires an understanding of how the context of control flow in a program affects the *correct* execution of the program. If at some point, due to some intentional or unintentional reason, the context of the control flow changes (such as the value of a register changes), but not due to the instructions of the program's control flow itself. This will make the execution of the subsequent program instructions deviate, and eventually the execution process or execution results fail to meet expectations. This situation is called **Program Execution Error**. It is the operating system's responsibility to protect the context of the control flow in the application so that the application can execute correctly.
 
 .. 我们这里说的控制流的上下文是指仅会影响控制流正确执行的有限的物理/虚拟资源内容。这里需要理解程序中控制流的上下文对程序 *正确* 执行的影响。如果在某时刻，由于某种有意或无意的原因，控制流的上下文发生了变化（比如某个寄存器的值变了），但并不是由于程序的控制流本身的指令导致的，这就会使得接下来的程序指令执行出现偏差，并最终导致执行过程或执行结果不符合预期，这种情形称为 **程序执行错误** 。 而操作系统有责任来保护应用程序中控制流的上下文，以让应用程序得以正确执行。
 
@@ -156,7 +155,7 @@ During the continuous execution of instructions by the CPU, the above contexts (
 
 The context preservation and restoration of the exception control flow is mainly completed through the cooperation of the CPU and the operating system (manually writing instructions to save and restore registers on the stack); the context preservation and restoration of the control flow transfer for a function is mainly through the compiler (automatically generate instructions to save and restore registers on the stack) to help complete.
 
-In the operating system, three types of exceptional control flow need to be handled: Device Interrupt ,Trap and Exception, also known as Fault Interrupt. 
+In the operating system, three types of exceptional control flow need to be handled: Device Interrupt, Trap and Exception, also known as Fault Interrupt. 
 
 .. 对于异常控制流的上下文保存与恢复，主要是通过 CPU 和操作系统（手动编写在栈上保存与恢复寄存器的指令）来协同完成；对于函数转移控制流的上下文保存与恢复，主要是通过编译器（自动生成在栈上保存与恢复寄存器的指令）来帮助完成的。
 
@@ -172,100 +171,149 @@ In the operating system, three types of exceptional control flow need to be hand
    无论是操作系统还是应用程序，它在某一段时间上的执行过程会让处理器执行一系列程序的指令，并对计算机的物理资源的内容（即上下文）进行了改变。如果结合上面的抽象概念更加细致地表述一下，可以认为在它从开始到结束的整个执行过程中，截取其中一个时间段，在这个时间段中，它所执行的指令流形成了这个时间段的控制流，而控制流中的每条执行的指令和它执行后的上下文，形成由二元组<指令指针，上下文>（<pc，context>）构成的有序序列，我们用 **执行流** (Execution Flow) 或 **执行历史** (Execution History) 来表示这个二元组有序序列。它完整描述了操作系统或应用程序在一段时间内执行的指令流以及计算机物理资源的变化过程。
 
 
-异常控制流：中断
+.. 异常控制流：中断
+
+Exceptional Control Flow: Interrupt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-外设 **中断** (Interrupt) 由外部设备引起的外部 I/O 事件如时钟中断、控制台中断等。外设中断是异步产生的，与处理器的执行无关。产生中断后，操作系统需要进行中断处理来响应中断请求，这会破坏被打断前应用程序的控制流上下文，所以操作系统要保存与恢复被打断前应用程序的控制流上下文。
+Device **Interrupt** are external I/O events caused by external devices such as clock interrupts, console interrupts, etc. Device interrupts are generated asynchronously and have nothing to do with processor execution. After an interrupt is generated, the operating system needs to perform interrupt processing to respond to the interrupt request, which will destroy the control flow context of the application before being interrupted. So the operating system must save and restore the control flow context of the application before being interrupted.
+
+.. 外设 **中断** (Interrupt) 由外部设备引起的外部 I/O 事件如时钟中断、控制台中断等。外设中断是异步产生的，与处理器的执行无关。产生中断后，操作系统需要进行中断处理来响应中断请求，这会破坏被打断前应用程序的控制流上下文，所以操作系统要保存与恢复被打断前应用程序的控制流上下文。
 
 .. image:: interrupt.png
    :align: center
    :name: interrupt
 
-异常控制流：异常
+.. 异常控制流：异常
+
+Exceptional Control Flow: Exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**异常** (Exception) 是在处理器执行指令期间检测到不正常的或非法的内部事件（如 x86 平台上的除零错、地址访问越界）。产生异常后，操作系统需要进行异常处理，这会破坏被打断前应用程序的控制流上下文，所以操作系统要保存与恢复被打断前应用程序的控制流上下文。
+**Exception** is an abnormal or illegal internal event detected during the execution of instructions by the processor (such as division by zero on the x86 platform, address access out of bounds). After an exception is generated, the operating system needs to perform exception handling, which will destroy the control flow context of the application before being interrupted. So the operating system must save and restore the control flow context of the application before being interrupted.
+
+.. **异常** (Exception) 是在处理器执行指令期间检测到不正常的或非法的内部事件（如 x86 平台上的除零错、地址访问越界）。产生异常后，操作系统需要进行异常处理，这会破坏被打断前应用程序的控制流上下文，所以操作系统要保存与恢复被打断前应用程序的控制流上下文。
 
 .. note::
 
-   如果是应用程序产生的不可恢复的异常，操作系统有权直接终止该应用程序的执行。
+   If an unrecoverable exception is generated by an application, the operating system has the right to directly terminate the execution of the application.
+
+   .. 如果是应用程序产生的不可恢复的异常，操作系统有权直接终止该应用程序的执行。
+
 
 
 .. image:: exception.png
    :align: center
    :name: exception
 
-异常控制流：陷入
+.. 异常控制流：陷入
+
+Exceptional Control Flow: Trap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**陷入** (Trap) 是程序在执行过程中由于要通过系统调用请求操作系统服务而有意引发的事件。产生陷入后，操作系统需要执行系统调用服务来响应系统调用请求，这会破坏陷入前应用程序的控制流上下文，所以操作系统要保存与恢复陷入前应用程序的控制流上下文。
+**Trap** is an event that is intentionally triggered by a program during execution because it requests operating system services through a system call. After a trap occurs, the operating system needs to execute a system call service to respond to the system call request, which will destroy the control flow context of the application before the trap. So the operating system must save and restore the control flow context of the application before the trap.
+
+.. **陷入** (Trap) 是程序在执行过程中由于要通过系统调用请求操作系统服务而有意引发的事件。产生陷入后，操作系统需要执行系统调用服务来响应系统调用请求，这会破坏陷入前应用程序的控制流上下文，所以操作系统要保存与恢复陷入前应用程序的控制流上下文。
 
 .. image:: syscall.png
    :align: center
    :name: syscall   
 
-在后面的叙述中，如果没有特别指出，我们将用简称中断、陷入、异常来区分这三种异常控制流。
+.. 在后面的叙述中，如果没有特别指出，我们将用简称中断、陷入、异常来区分这三种异常控制流。
+
+In the following description, if not specified, we will use the abbreviations interrupt, trap, and exception to distinguish these three exceptional control flows.
 
 .. note::
    
-   本书是从操作系统的角度来给出的中断 (Interrupt) 、陷入 (Trap) 和异常（Exception）的定义。
+   This book defines Interrupt, Trap and Exception from the perspective of the operating system.
 
-   在不同的书籍中，对于中断、陷入和异常的定义会有一些差别。有的书籍把中断、陷入和异常都统一为一种中断，表示程序的当前控制流被打断了，要去执行不属于这个控制流的另外一个没有程序逻辑先后关系的控制流；也有书籍把这三者统一为一种异常，表示相对于程序的正常控制流而言，出现了一种没有程序逻辑先后关系的异常控制流。甚至也有书籍把这三者统一为一种陷入，表示相对于程序的正常控制流而言，CPU 会陷入到操作系统内核中去执行。
+   In different books, there will be some differences in the definition of interrupt, trap and exception. Some books unify interrupt, trap, and exception into one kind of interrupt, which means that the current control flow of the program is interrupted. And another control flow, which does not belong to the former and nor has any sequence relationship to the former, needs to kicks in. In some books, these three are unified into an exception. It implies that, compared with the normal control flow of the program, there is an exceptional control flow that has no sequence relationship of the program logic. There are even books that unify these three into a trap, which means that compared to the normal control flow of the program, the CPU will trap into the operating system kernel for execution.
 
-   在 RISC-V 的特权级规范文档中，异常指的是由于 CPU 当前指令执行而产生的异常控制流，中断指的是与 CPU 当前指令执行无关的异常控制流，中断和异常统称为陷入。当中断或异常触发时，我们首先进行统一的陷入处理流程，随即根据 ``mcause/scause`` 等寄存器的内容判定目前触发的是中断还是异常，再对应进行处理。在操作系统意义上的陷入，在 RISC-V 的语境下属于异常的一部分。另外，在 x86 架构下的“软件中断”（也即指令 ``int 0x80`` ）可以理解为操作系统意义上的陷入，但在 RISC-V 语境下软件中断表示一种特殊的处理核间中断。
+   In RISC-V's privilege level specification document, an exception refers to the exceptional control flow generated by the execution of the current instruction of the CPU, and the interruption refers to the exceptional control flow unrelated to the execution of the current instruction of the CPU. Interrupts and exceptions are collectively referred to as trapping. When an interrupt or exception is triggered, we first perform a unified trap processing flow, and then judge whether the current trigger is an interrupt or an exception based on the contents of registers such as ``mcause/scause``, and then handle it accordingly. A trap in the sense of the operating system is a part of the exception in the context of RISC-V. In addition, the "software interrupt" (that is, the instruction ``int 0x80``) under the x86 architecture can be understood as a trap in the sense of the operating system, but in the context of RISC-V, the software interrupt represents a special processing inter-core interruption.
+
+   These are all interpretations of interrupts, traps, and exceptions from different perspectives, and there is no single precise explanation. For students, the key point is to understand the specific meanings and characteristics of these terms in the design and implementation of the operating system in the subsequent chapters.
+
+   .. 本书是从操作系统的角度来给出的中断 (Interrupt) 、陷入 (Trap) 和异常（Exception）的定义。
+
+   .. 在不同的书籍中，对于中断、陷入和异常的定义会有一些差别。有的书籍把中断、陷入和异常都统一为一种中断，表示程序的当前控制流被打断了，要去执行不属于这个控制流的另外一个没有程序逻辑先后关系的控制流；也有书籍把这三者统一为一种异常，表示相对于程序的正常控制流而言，出现了一种没有程序逻辑先后关系的异常控制流。甚至也有书籍把这三者统一为一种陷入，表示相对于程序的正常控制流而言，CPU 会陷入到操作系统内核中去执行。
+
+   .. 在 RISC-V 的特权级规范文档中，异常指的是由于 CPU 当前指令执行而产生的异常控制流，中断指的是与 CPU 当前指令执行无关的异常控制流，中断和异常统称为陷入。当中断或异常触发时，我们首先进行统一的陷入处理流程，随即根据 ``mcause/scause`` 等寄存器的内容判定目前触发的是中断还是异常，再对应进行处理。在操作系统意义上的陷入，在 RISC-V 的语境下属于异常的一部分。另外，在 x86 架构下的“软件中断”（也即指令 ``int 0x80`` ）可以理解为操作系统意义上的陷入，但在 RISC-V 语境下软件中断表示一种特殊的处理核间中断。
    
-   这些都是从不同的视角来阐释中断、陷入和异常，并没有一个唯一精确的解释。对于同学而言，重点是了解这些术语在后续章节的操作系统设计实现中所表示的具体含义和特征。   
+   .. 这些都是从不同的视角来阐释中断、陷入和异常，并没有一个唯一精确的解释。对于同学而言，重点是了解这些术语在后续章节的操作系统设计实现中所表示的具体含义和特征。   
 
 .. _term_process:
 
-进程
+.. 进程
+
+Process
 ----------------------------------
 
-站在应用程序自身的角度来看，进程 (Process) 的一个经典定义是一个正在运行的程序实例。当程序运行在操作系统中的时候，从程序的视角来看，它会产生一种“幻觉”：即该程序是整个计算机系统中当前运行的唯一的程序，能够独占使用处理器、内存和外设，而且程序中的代码和数据是系统内存中唯一的对象。
+From the perspective of the application itself, a classic definition of a process is a running program instance. When a program runs in the operating system, from the perspective of the program, it will produce an "illusion": that is, the program is the only program currently running in the entire computer system and can exclusively use the processor, memory and peripherals. And the code and data in the program are the only objects in the system memory.
+
+.. 站在应用程序自身的角度来看，进程 (Process) 的一个经典定义是一个正在运行的程序实例。当程序运行在操作系统中的时候，从程序的视角来看，它会产生一种“幻觉”：即该程序是整个计算机系统中当前运行的唯一的程序，能够独占使用处理器、内存和外设，而且程序中的代码和数据是系统内存中唯一的对象。
 
 .. image:: prog-illusion.png
    :align: center
    :name: prog-illusion
 
-然而，这种“幻觉”是操作系统为了便于应用的开发且不损失安全性刻意为应用程序营造出来的，它具体表现为“进程”这个抽象概念。站在计算机系统和操作系统的角度来看，并不存在这种“幻觉”。事实上，在一段时间之内，往往会有多个程序同时或交替在操作系统上运行，因此程序并不能独占整个计算机系统。具体而言，进程是应用程序的一次执行过程。并且在这个执行过程中，由“操作系统”执行环境来管理程序执行过程中的 **进程上下文** -- 一种控制流上下文。这里的进程上下文是指程序在运行中的各种物理/虚拟资源（寄存器、可访问的内存区域、打开的文件、信号等）的内容，特别是与程序执行相关的具体内容：内存中的代码和数据，栈、堆、当前执行的指令位置（程序计数器的内容）、当前执行时刻的各个通用寄存器中的值等。进程上下文如下图所示：
+However, this "illusion" is deliberately created by the operating system for the application program in order to facilitate application development without loss of security, and it is embodied in the abstract concept of "process". From the perspective of computer systems and operating systems, this "illusion" does not exist. In fact, within a period of time, there are often multiple programs running on the operating system at the same time or alternately, so the program cannot monopolize the entire computer system. Specifically, a process is an execution process of an application program. And during this execution, the "operating system" execution environment manages the **process context** during program execution -- a control flow context. The process context here refers to the state of various physical/virtual resources (registers, accessible memory areas, open files, signals, etc.) of the program during operation, especially the specific state related to program execution: code and data in memory, stack, heap, currently executed instruction position (state of program counter), value in each general-purpose register at the current execution moment, etc. The process context is shown in the figure below:
+
+.. 然而，这种“幻觉”是操作系统为了便于应用的开发且不损失安全性刻意为应用程序营造出来的，它具体表现为“进程”这个抽象概念。站在计算机系统和操作系统的角度来看，并不存在这种“幻觉”。事实上，在一段时间之内，往往会有多个程序同时或交替在操作系统上运行，因此程序并不能独占整个计算机系统。具体而言，进程是应用程序的一次执行过程。并且在这个执行过程中，由“操作系统”执行环境来管理程序执行过程中的 **进程上下文** -- 一种控制流上下文。这里的进程上下文是指程序在运行中的各种物理/虚拟资源（寄存器、可访问的内存区域、打开的文件、信号等）的内容，特别是与程序执行相关的具体内容：内存中的代码和数据，栈、堆、当前执行的指令位置（程序计数器的内容）、当前执行时刻的各个通用寄存器中的值等。进程上下文如下图所示：
 
 .. image:: context-of-process.png
    :align: center
    :name: context-of-process
 
 
-我们知道，处理器是计算机系统中的硬件资源。为了提高处理器的利用率，操作系统需要让处理器足够忙，即让不同的程序轮流占用处理器来运行。如果一个程序因某个事件而不能运行下去时，就通过进程上下文切换把处理器占用权转交给另一个可运行程序。进程上下文切换如下图所示：
+We know that a processor is a hardware resource in a computer system. In order to improve the utilization rate of the processor, the operating system needs to keep the processor busy enough, that is, let different programs take turns to run on the processor. If a program cannot continue to run due to a certain event, the processor occupancy right is transferred to another runnable program through process context switching. Process context switching is shown in the following figure:
+
+
+.. 我们知道，处理器是计算机系统中的硬件资源。为了提高处理器的利用率，操作系统需要让处理器足够忙，即让不同的程序轮流占用处理器来运行。如果一个程序因某个事件而不能运行下去时，就通过进程上下文切换把处理器占用权转交给另一个可运行程序。进程上下文切换如下图所示：
 
 .. image:: context-switch.png
    :align: center
    :name: context-switch
 
-基于上面的介绍，我们可以给进程一个更加准确的定义：一个进程是一个具有一定独立功能的程序在一个数据集合上的一次动态执行过程。操作系统中的进程管理需要采用某种调度策略将处理器资源分配给程序并在适当的时候回收，并且要尽可能充分利用处理器的硬件资源。
+Based on the above introduction, we can give a more accurate definition of a process: a process is a dynamic execution process of a program with certain independent functions on a data set. The process management in the operating system needs to adopt a scheduling strategy to allocate processor resources to programs and reclaim them when appropriate, and to make full use of processor hardware resources as much as possible.
 
-地址空间
+.. 基于上面的介绍，我们可以给进程一个更加准确的定义：一个进程是一个具有一定独立功能的程序在一个数据集合上的一次动态执行过程。操作系统中的进程管理需要采用某种调度策略将处理器资源分配给程序并在适当的时候回收，并且要尽可能充分利用处理器的硬件资源。
+
+.. 地址空间
+
+Address Space
 ----------------------------------
 
-**地址空间** (Address Space) 是对物理内存的虚拟化和抽象，也称虚存 (Virtual Memory)。它就是操作系统通过处理器中的内存管理单元 (MMU, Memory Management Unit) 硬件的支持而给应用程序和用户提供一个大的（可能超过计算机中的物理内存容量）、连续的（连续的地址空间编址）、私有的（其他应用程序无法破坏）的存储空间。这需要操作系统将内存和外存（即持久存储，硬盘是一种典型的外存）结合起来管理，为用户提供一个容量比实际内存大得多的虚拟存储器，并且需要操作系统为应用程序分配内存空间，使用户存放在内存中的程序和数据彼此隔离、互不侵扰。操作系统中的虚存管理与处理器的 MMU 密切相关,在启动虚存机制后，软件通过 CPU 访问的每个虚拟地址都需要通过 CPU 中的 MMU 转换为一个物理地址来进行访问。下面是虚拟的地址空间与物理内存和物理磁盘映射的图示：
+**Address Space** (Address Space) is the virtualization and abstraction of the physical memory, also known as virtual memory (Virtual Memory). 
+The virtual memory is a large (may exceed the physical memory capacity in the computer), contiguous (contiguous in the address space), private (insusceptible to other programs) storage space, offered to users and applications and created by the operating system through a processor's memory management unit (MMU). 
+This requires an operating system to combine memory and external memory (ie, persistent storage, hard disk is a typical external memory) to provide users with a virtual memory with a capacity much larger than the actual memory. And it also requires an operating system to allocate memory for applications. The memory space enables the programs and data stored in the memory to be isolated from each other without interfering with each other. The virtual memory management in the operating system is closely related to the MMU of the processor. After the virtual memory mechanism starts, each virtual address accessed by the software through the CPU needs to be translated into a physical address by the MMU in the CPU for access. The following is an illustration of the virtual address space mapped to physical memory and physical disk:
+
+.. **地址空间** (Address Space) 是对物理内存的虚拟化和抽象，也称虚存 (Virtual Memory)。它就是操作系统通过处理器中的内存管理单元 (MMU, Memory Management Unit) 硬件的支持而给应用程序和用户提供一个大的（可能超过计算机中的物理内存容量）、连续的（连续的地址空间编址）、私有的（其他应用程序无法破坏）的存储空间。这需要操作系统将内存和外存（即持久存储，硬盘是一种典型的外存）结合起来管理，为用户提供一个容量比实际内存大得多的虚拟存储器，并且需要操作系统为应用程序分配内存空间，使用户存放在内存中的程序和数据彼此隔离、互不侵扰。操作系统中的虚存管理与处理器的 MMU 密切相关,在启动虚存机制后，软件通过 CPU 访问的每个虚拟地址都需要通过 CPU 中的 MMU 转换为一个物理地址来进行访问。下面是虚拟的地址空间与物理内存和物理磁盘映射的图示：
 
 
 .. image:: address-space.png
    :align: center
    :name: address-space
 
-文件
+.. 文件
+
+File
 ----------------------------------
 
-**文件** (File) 主要用于对持久存储的抽象，并进一步扩展到为外设的抽象。具体而言，文件可理解为存放在持久存储介质（比如硬盘、光盘、U盘等）上，方便应用程序和用户读写的数据。以磁盘为代表的持久存储介质的数据访问单位是一个扇区或一个块，而在内存中的数据访问单位是一个字节或一个字。这就需要操作系统通过文件来屏蔽磁盘与内存差异，尽量以内存的读写方式来处理持久存储的数据。当处理器需要访问文件中的数据时，可通过操作系统把它们装入内存。文件管理的任务是有效地支持文件的存储、
-检索和修改等操作。
+**File** is mainly used for the abstraction of a persistent storage, and further extended to the abstraction of peripherals. Specifically, a file can be understood as data stored on a persistent storage medium (such as a hard disk, CD, USB flash drive, etc.), which is convenient for applications and users to read and write. The data access unit of the persistent storage medium represented by the disk is a sector or a block, while the data access unit in the memory is a byte or a word. This requires the operating system to shield the difference between disk and memory through files, and try to process persistently stored data in the way of reading and writing memory. When the processor needs to access the data in the file, it can be loaded into memory by the operating system. The task of file management is to effectively support the storage of files,
 
-下面是文件对磁盘的抽象映射图示：
+.. **文件** (File) 主要用于对持久存储的抽象，并进一步扩展到为外设的抽象。具体而言，文件可理解为存放在持久存储介质（比如硬盘、光盘、U盘等）上，方便应用程序和用户读写的数据。以磁盘为代表的持久存储介质的数据访问单位是一个扇区或一个块，而在内存中的数据访问单位是一个字节或一个字。这就需要操作系统通过文件来屏蔽磁盘与内存差异，尽量以内存的读写方式来处理持久存储的数据。当处理器需要访问文件中的数据时，可通过操作系统把它们装入内存。文件管理的任务是有效地支持文件的存储、 检索和修改等操作。
+
+The following is an illustration of the abstract mapping of files to disk:
+
+.. 下面是文件对磁盘的抽象映射图示：
 
 .. image:: file-disk.png
    :align: center
    :name: file-disk
 
 
-从一个更高和更广泛的层次上看，各种外设虽然差异很大，但也有基本的读写操作，可以通过文件来进行统一的抽象，并在操作系统内部实现中来隐藏对外设的具体访问过程，从而让用户可以以统一的文件操作来访问各种外设。这样就可以把文件看成是对外设的一种统一抽象，应用程序通过基本的读写操作来完成对外设的访问。
+From a higher and broader level, although various peripherals are very different, they also have basic read and write operations, which can be unified and abstracted through files, and hidden in the internal implementation of the operating system. The specific access process allows users to access various peripherals with unified file operations. In this way, the file can be regarded as a unified abstraction of the peripheral, and the application program completes the access to the peripheral through basic read and write operations.
+
+.. 从一个更高和更广泛的层次上看，各种外设虽然差异很大，但也有基本的读写操作，可以通过文件来进行统一的抽象，并在操作系统内部实现中来隐藏对外设的具体访问过程，从而让用户可以以统一的文件操作来访问各种外设。这样就可以把文件看成是对外设的一种统一抽象，应用程序通过基本的读写操作来完成对外设的访问。
 
 
 .. [#CSAPP] 兰德尔 E.布莱恩特（Randal E.·Bryant） 著，龚奕利，贺莲 译, Computer Systems: A Programmer's Perspective (3rd Edition), 深入理解计算机系统（原书第3版）,机械工业出版社， 2016
