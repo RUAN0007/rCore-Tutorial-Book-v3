@@ -91,7 +91,7 @@ In order for the operating system to keep the CPU fully busy and make full use o
 Asynchrony
 ----------------------------------
 
-Here, asynchrony means that due to the scheduling and interruption of the operating system, the currently running program will be suspended or interrupted from time to time, making the entire running process of the program stop and go. In terms of the performance of the application program, it is especially reflected in the fact that its execution completion time is unpredictable. But it should be noted that as long as the input of the application is consistent, its output should be as expected.
+Here, asynchrony means that due to the scheduling and interruption of the operating system, the currently running program will be suspended or interrupted from time to time. It makes the entire running process of the program stop and go. In terms of the performance of the application program, it is especially reflected in the fact that its execution completion time is unpredictable. But it should be noted that as long as the input of the application is consistent, its output should be as expected.
 
 .. 在这里，异步是指由于操作系统的调度和中断等，会不时地暂停或打断当前正在运行的程序，使得程序的整个运行过程走走停停。在应用程序运行的表现上，特别体现在它的执行完成时间是不可预测的。但需要注意，只要应用程序的输入是一致的，那么它的输出结果应该是符合预期的。
 
