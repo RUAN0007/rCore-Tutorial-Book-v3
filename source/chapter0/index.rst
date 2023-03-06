@@ -1,6 +1,8 @@
 .. _link-chapter0:
 
-第零章：操作系统概述
+.. 第零章：操作系统概述
+
+Chapter 0: Operating System Overview
 ==============================================
 
 .. toctree::

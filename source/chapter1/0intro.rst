@@ -1,22 +1,40 @@
-引言
+.. 引言
+
+Introduction
 =====================
 
-本章导读
+.. 本章导读
+
+Chapter Guide
 --------------------------
 
 .. chyyuu
   这是注释：我觉得需要给出执行环境（EE），Task，...等的描述。
   并且有一个图，展示这些概念的关系。
   
-本章展现了操作系统的一个基本目标：让应用与硬件隔离，简化了应用访问硬件的难度和复杂性。这也是远古操作系统雏形和现代的一些简单嵌入式操作系统的主要功能。具有这样功能的操作系统形态就是一个函数库，可以被应用访问，并通过函数库的函数来访问硬件。
 
-大多数程序员的第一行代码都从 ``Hello, world!`` 开始，当我们满怀着好奇心在编辑器内键入仅仅数个字节，再经过几行命令编译（靠的是编译器）、运行（靠的是操作系统），终于在黑洞洞的终端窗口中看到期望中的结果的时候，一扇通往编程世界的大门已经打开。在本章第一节 :doc:`1app-ee-platform` 中，可以看到用Rust语言编写的非常简单的“Hello, world”应用程序是如何被进一步拆解和分析的。
+This chapter presents one of the fundamental goals of an operating system: to isolate applications from hardware, simplifying the difficulty and complexity of applications accessing hardware. This is also the main function of the prototype of the ancient operating system and some modern simple embedded operating systems. The form of the operating system with such functions is a function library, which can be accessed by applications and access hardware through the functions of the function library.
 
-不过我们能够隐约意识到编程工作能够如此方便简洁并不是理所当然的，实际上有着多层硬件和软件工具和支撑环境隐藏在它背后，才让我们不必付出那么多努力就能够创造出功能强大的应用程序。生成应用程序二进制执行代码所依赖的是以 **编译器** 为主的 **开发环境** ；运行应用程序执行码所依赖的是以 **操作系统** 为主的 **执行环境** 。
+The first line of code for most programmers starts with ``Hello, world!``.  When we are full of curiosity and type only a few bytes in the editor, and then compile (rely on the compiler) and run (rely on the operating system) with a few lines of commands, we finally see what we expect in the black hole terminal window. By that time, a door to the world of programming has opened. In the first section of this chapter :doc:`1app-ee-platform`, you can see how a very simple "Hello, world" application written in Rust is further disassembled and analyzed.
 
-本章主要是讲解如何设计和实现建立在裸机上的执行环境，并让应用程序能够在这样的执行环境中运行。从而让同学能够对应用程序和它所依赖的执行环境有一个全面和深入的理解。
+.. 本章展现了操作系统的一个基本目标：让应用与硬件隔离，简化了应用访问硬件的难度和复杂性。这也是远古操作系统雏形和现代的一些简单嵌入式操作系统的主要功能。具有这样功能的操作系统形态就是一个函数库，可以被应用访问，并通过函数库的函数来访问硬件。
 
-本章的目标仍然只是让应用程序输出 ``Hello, world!`` 字符串，但这一次，我们将离开舒适区，基于一个几乎空无一物的硬件平台从零开始搭建我们自己的软件高楼大厦，而不是仅仅通过一行语句就完成任务。所以，在接下来的内容中，我们将描述如何让 ``Hello, world!`` 应用程序逐步脱离对编译器、运行时库和操作系统的现有复杂依赖，最终以最小的依赖需求能在裸机上运行。这时，我们也可把这个能在裸机上运行的 ``Hello, world!`` 应用程序所依赖的软件库称为一种支持输出字符串的非常初级的寒武纪“三叶虫”操作系统 -- LibOS。LibOS其实就是一个给应用提供各种服务（比如输出字符串）的库，方便了单一应用程序在裸机上的开发与运行。输出字符串的功能好比是三叶虫的眼睛功能，有了它，我们就有了对软件的最基本的动态分析与调试功能，即通过在代码中的不同位置插入特定内容的输出语句来实现对应用程序和操作系统运行状态的分析与调试。
+.. 大多数程序员的第一行代码都从 ``Hello, world!`` 开始，当我们满怀着好奇心在编辑器内键入仅仅数个字节，再经过几行命令编译（靠的是编译器）、运行（靠的是操作系统），终于在黑洞洞的终端窗口中看到期望中的结果的时候，一扇通往编程世界的大门已经打开。在本章第一节 :doc:`1app-ee-platform` 中，可以看到用Rust语言编写的非常简单的“Hello, world”应用程序是如何被进一步拆解和分析的。
+
+However, we can vaguely realize that it is not a matter of course that programming work can be so convenient and concise. In fact, there are multiple layers of hardware and software tools and supporting environments hidden behind it, so that we can create powerful applications without paying so much effort. Generating application binary execution code depends on **development environment**, mainly **compiler**; running application execution code depends on **execution environment**, mainly **operating system**.
+
+This chapter mainly explains how to design and implement an execution environment built on bare metal, and enable applications to run in such an execution environment. So that students can have a comprehensive and in-depth understanding of the application and the execution environment it depends on.
+
+.. 不过我们能够隐约意识到编程工作能够如此方便简洁并不是理所当然的，实际上有着多层硬件和软件工具和支撑环境隐藏在它背后，才让我们不必付出那么多努力就能够创造出功能强大的应用程序。生成应用程序二进制执行代码所依赖的是以 **编译器** 为主的 **开发环境** ；运行应用程序执行码所依赖的是以 **操作系统** 为主的 **执行环境** 。
+
+
+This chapter mainly explains how to design and implement an execution environment built on bare metal, and enable applications to run in such an execution environment. So that students can have a comprehensive and in-depth understanding of the application and the execution environment it depends on.
+
+The goal of this chapter is still just to make the application output the ``Hello, world!`` string, but this time, we will leave our comfort zone and build our own software high-rise building from scratch based on an almost empty hardware platform, instead of fulfilling the task with just one line of statement. Therefore, in the following, we will describe how to make ``Hello, world!`` applications gradually break away from the existing complex dependencies on compilers, runtime libraries, and operating systems, and finally be able to run on a bare metal machine. At this time, we can also call the software library that empowers this ``Hello, world!`` application to run on a bare metal a Cambrian "trilobite" operating system LibOS, a very rudimentary OS only supports outputing strings. LibOS is actually a library that provides various services (such as outputting strings) to applications, which facilitates the development and operation of a single application on a bare metal. The function of outputting strings is like the eye function of trilobites. With it, we have the most basic dynamic analysis and debugging functions for software, that is, by inserting specific content output statements at different positions in the code for the analysis and debugging of application program and operating system running status.
+
+.. 本章主要是讲解如何设计和实现建立在裸机上的执行环境，并让应用程序能够在这样的执行环境中运行。从而让同学能够对应用程序和它所依赖的执行环境有一个全面和深入的理解。
+
+.. 本章的目标仍然只是让应用程序输出 ``Hello, world!`` 字符串，但这一次，我们将离开舒适区，基于一个几乎空无一物的硬件平台从零开始搭建我们自己的软件高楼大厦，而不是仅仅通过一行语句就完成任务。所以，在接下来的内容中，我们将描述如何让 ``Hello, world!`` 应用程序逐步脱离对编译器、运行时库和操作系统的现有复杂依赖，最终以最小的依赖需求能在裸机上运行。这时，我们也可把这个能在裸机上运行的 ``Hello, world!`` 应用程序所依赖的软件库称为一种支持输出字符串的非常初级的寒武纪“三叶虫”操作系统 -- LibOS。LibOS其实就是一个给应用提供各种服务（比如输出字符串）的库，方便了单一应用程序在裸机上的开发与运行。输出字符串的功能好比是三叶虫的眼睛功能，有了它，我们就有了对软件的最基本的动态分析与调试功能，即通过在代码中的不同位置插入特定内容的输出语句来实现对应用程序和操作系统运行状态的分析与调试。
 
 
 .. chyyuu note
@@ -43,20 +61,35 @@
 .. note::
    
 
-   **最早的操作系统雏形是计算工资单的程序库**
+   **The earliest prototype of the operating system was a program library for calculating payroll**
 
-   操作系统需要给程序员提供支持：高效便捷地开发应用和执行应用。远古时期的计算机硬件昂贵笨重，能力弱，单靠硬件还不能高效地执行应用，能够减少程序员的开发成本就已经很不错了。
+   The operating system needs to provide support for programmers: to develop applications and execute applications efficiently and conveniently. Computer hardware in ancient times was expensive, cumbersome, and weak, and hardware alone could not execute applications efficiently. It would be good to reduce the development cost of programmers.
 
-   程序库一般由一些子程序（函数）组成。通过调用程序库中的子程序，应用程序可以更加方便的实现其应用功能。但在早期的软件开发中，还缺少便捷有效的子程序调用机制。
+   A library generally consists of some subroutines (functions). By calling the subroutines in the program library, the application program can realize its application function more conveniently. But in the early software development, there is still a lack of convenient and effective subroutine calling mechanism.
 
-   根据维基百科的操作系统时间线 [#OSTIMELINE]_ 上的记录，1949-1951 年，英国 J. Lyons and Co. 公司（一家包括连锁餐厅和食品制造的大型集团公司）开创性地引入并使用剑桥大学的 EDSAC 计算机，联合设计实现了 LEO I 'Lyons Electronic Office' 软硬件系统，利用计算机的高速度(按当时的标准)来高效地计算薪资，以及组织蛋糕和其他易腐烂的商品的分配等。这样计算机就成为了一个高效的专用事务处理系统。但软件开发还是一个很困难的事情，需要减少软件编程人员的开发负担。而通过函数库来重用软件功能并简化应用的编程是当时自然的想法。但在软件编程中，由于硬件的局限性（缺少索引寄存器、保存函数返回地址的寄存器、栈寄存器、硬件栈等），早期的程序员不得不使用在程序中修改自身代码的方式来访问数组或调用函数。从现在的视角看来，这样具有自修改能力的程序是一种黑科技。
+   According to records on Wikipedia's Operating System Timeline [#OSTIMELINE]_, from 1949 to 1951, the British company J. Lyons and Co. (a large group company including restaurant chains and food manufacturing) pioneered the introduction and use of Cambridge The university's EDSAC computer, jointly designed and realized the LEO I 'Lyons Electronic Office' hardware and software system, used the high speed of the computer (by the standards of that time) to efficiently calculate salary and organize the distribution of cakes and other perishable commodities. In this way, the computer becomes an efficient special-purpose transaction processing system. But software development is still a very difficult task, and it is necessary to reduce the development burden of software programmers. It was a natural idea at the time to reuse software functions and simplify application programming through function libraries. However, in software programming, due to hardware limitations (lack of index registers, registers for saving function return addresses, stack registers, hardware stacks, etc.), early programmers had to modify their own code in the program to access arrays or call functions. From the current point of view, such a program with self-modifying ability is a black technology. 
 
-   参与 EDSAC 项目的 David Wheeler 发明了子程序的概念 --  **Wheeler Jump** 。Wheeler 的方法是在子程序的最后一行添加 **“jump to this address”** 指令，并在指令后跟一个内存空间，这个内存空间通常被设置为 0，在子程序被调用后，这个内存空间的值会被修改为返回地址。当调用子程序时，调用者（Caller）的地址将被放置在累加寄存器中，然后代码将跳转到子程序的入口。子程序的第一条指令将根据累加寄存器中的值计算返回地址，通常是调用指令的下一条指令所在的内存位置，然后将计算出的返回地址写入先前预留的内存空间中。当子程序继续执行，自然会到达子程序的末尾，即 **“jump to this address”** 指令处，这条指令读取位于它之后的内存单元，获得返回地址，就可以正常返回了。
+   David Wheeler, who worked on the EDSAC project, invented the concept of a subroutine -- **Wheeler Jump**. Wheeler's method is to add a **"jump to this address"** instruction on the last line of the subroutine, followed by a memory space. This memory space is usually set to 0. After the subroutine is called, the value of this memory space will be modified to the return address. When a subroutine is called, the address of the caller (Caller) will be placed in the accumulation register, and then the code will jump to the entry of the subroutine. The first instruction of the subroutine will calculate the return address based on the value in the accumulation register, usually the memory location of the instruction next to the calling instruction, and then write the calculated return address into the previously reserved memory space. When the subroutine continues to execute, it will naturally reach the end of the subroutine, which is the **"jump to this address"** instruction. This instruction reads the memory unit behind it, obtains the return address, and returns normally.
 
-   在有了便捷有效的子程序概念和子程序调用机制后，软件开发人员在 EDSAC 计算机开发了大量的子程序库，其中就包括了检查计算机系统，加载应用软件，写数据到持久性存储设备中，打印数据等硬件系统相关功能的系统子程序库。这样程序员就可以方便开发应用程序来使用计算机了。这也是为何维基百科的的操作系统时间线 [#OSTIMELINE]_ 一文中，把 LEO I 'Lyons Electronic Office' 软件系统（其实就是硬件系统相关的子程序库）定位为最早（1951 年）的操作系统的起因。这样的计算机系统只支持一个应用的运行，可以称为专用计算机系统。1951 年 9 月 5 日，计算机首次执行了一个名为 Bakeries Valuations 的应用程序，并在后续承担计算工资单这一必须按时执行的任务，因为必须向员工按时支付周薪。计算员工薪酬的任务需要一位经验丰富的文员 8 分钟内完成，而  LEO I 在 1.5 秒内完成了这项工作，快了 320 倍，这在当时英国社会上引起了轰动。
+   With the convenient and effective subroutine concept and subroutine calling mechanism, software developers have developed a large number of subroutine libraries on the EDSAC computer, including checking the computer system, loading application software, writing data to persistent storage devices, System subroutine library for hardware system-related functions such as printing data. In this way, programmers can easily develop applications to use computers. This is why Wikipedia's operating system timeline [#OSTIMELINE]_ article positioned the LEO I 'Lyons Electronic Office' software system (actually, the subroutine library related to the hardware system) as the initial (1951) cause for an operating system. Such a computer system only supports the operation of one application and may be called as a dedicated computer system. On September 5, 1951, computers first executed an application called Bakeries Valuations, and later took on the task of calculating payroll, which had to be done timely because employees had to be paid their weekly wages on time. The task of calculating employee salaries, which would have taken an experienced clerk 8 minutes to complete, was accomplished by the LEO I in 1.5 seconds, 320 times faster. It provoked a sensation in British society at the time.
+
+   Even now, there are a large number of simple embedded operating systems in the form of subroutine libraries, running on many microcontrollers based on Microcontroller Unit (MCU), and supporting simple applications or even single applications. These systems widely exists in toys, game consoles, small household appliances and other fields.
 
 
-   即使到了现在，以子程序库形式存在的简单嵌入式操作系统大量存在，运行在很多基于微控制单元（Microcontroller Unit，简称 MCU）的单片机中，并支持简单应用甚至是单一应用，在智能仪表、玩具、游戏机、小家电等领域广泛存在。
+   .. **最早的操作系统雏形是计算工资单的程序库**
+
+   .. 操作系统需要给程序员提供支持：高效便捷地开发应用和执行应用。远古时期的计算机硬件昂贵笨重，能力弱，单靠硬件还不能高效地执行应用，能够减少程序员的开发成本就已经很不错了。
+
+   .. 程序库一般由一些子程序（函数）组成。通过调用程序库中的子程序，应用程序可以更加方便的实现其应用功能。但在早期的软件开发中，还缺少便捷有效的子程序调用机制。
+
+   .. 根据维基百科的操作系统时间线 [#OSTIMELINE]_ 上的记录，1949-1951 年，英国 J. Lyons and Co. 公司（一家包括连锁餐厅和食品制造的大型集团公司）开创性地引入并使用剑桥大学的 EDSAC 计算机，联合设计实现了 LEO I 'Lyons Electronic Office' 软硬件系统，利用计算机的高速度(按当时的标准)来高效地计算薪资，以及组织蛋糕和其他易腐烂的商品的分配等。这样计算机就成为了一个高效的专用事务处理系统。但软件开发还是一个很困难的事情，需要减少软件编程人员的开发负担。而通过函数库来重用软件功能并简化应用的编程是当时自然的想法。但在软件编程中，由于硬件的局限性（缺少索引寄存器、保存函数返回地址的寄存器、栈寄存器、硬件栈等），早期的程序员不得不使用在程序中修改自身代码的方式来访问数组或调用函数。从现在的视角看来，这样具有自修改能力的程序是一种黑科技。
+
+   .. 参与 EDSAC 项目的 David Wheeler 发明了子程序的概念 --  **Wheeler Jump** 。Wheeler 的方法是在子程序的最后一行添加 **“jump to this address”** 指令，并在指令后跟一个内存空间，这个内存空间通常被设置为 0，在子程序被调用后，这个内存空间的值会被修改为返回地址。当调用子程序时，调用者（Caller）的地址将被放置在累加寄存器中，然后代码将跳转到子程序的入口。子程序的第一条指令将根据累加寄存器中的值计算返回地址，通常是调用指令的下一条指令所在的内存位置，然后将计算出的返回地址写入先前预留的内存空间中。当子程序继续执行，自然会到达子程序的末尾，即 **“jump to this address”** 指令处，这条指令读取位于它之后的内存单元，获得返回地址，就可以正常返回了。
+
+   .. 在有了便捷有效的子程序概念和子程序调用机制后，软件开发人员在 EDSAC 计算机开发了大量的子程序库，其中就包括了检查计算机系统，加载应用软件，写数据到持久性存储设备中，打印数据等硬件系统相关功能的系统子程序库。这样程序员就可以方便开发应用程序来使用计算机了。这也是为何维基百科的的操作系统时间线 [#OSTIMELINE]_ 一文中，把 LEO I 'Lyons Electronic Office' 软件系统（其实就是硬件系统相关的子程序库）定位为最早（1951 年）的操作系统的起因。这样的计算机系统只支持一个应用的运行，可以称为专用计算机系统。1951 年 9 月 5 日，计算机首次执行了一个名为 Bakeries Valuations 的应用程序，并在后续承担计算工资单这一必须按时执行的任务，因为必须向员工按时支付周薪。计算员工薪酬的任务需要一位经验丰富的文员 8 分钟内完成，而  LEO I 在 1.5 秒内完成了这项工作，快了 320 倍，这在当时英国社会上引起了轰动。
+
+
+   .. 即使到了现在，以子程序库形式存在的简单嵌入式操作系统大量存在，运行在很多基于微控制单元（Microcontroller Unit，简称 MCU）的单片机中，并支持简单应用甚至是单一应用，在智能仪表、玩具、游戏机、小家电等领域广泛存在。
 
 
 
