@@ -71,7 +71,7 @@ The goal of this chapter is still just to make the application output the ``Hell
 
    David Wheeler, who worked on the EDSAC project, invented the concept of a subroutine -- **Wheeler Jump**. Wheeler's method is to add a **"jump to this address"** instruction on the last line of the subroutine, followed by a memory space. This memory space is usually set to 0. After the subroutine is called, the value of this memory space will be modified to the return address. When a subroutine is called, the address of the caller (Caller) will be placed in the accumulation register, and then the code will jump to the entry of the subroutine. The first instruction of the subroutine will calculate the return address based on the value in the accumulation register, usually the memory location of the instruction next to the calling instruction, and then write the calculated return address into the previously reserved memory space. When the subroutine continues to execute, it will naturally reach the end of the subroutine, which is the **"jump to this address"** instruction. This instruction reads the memory unit behind it, obtains the return address, and returns normally.
 
-   With the convenient and effective subroutine concept and subroutine calling mechanism, software developers have developed a large number of subroutine libraries on the EDSAC computer, including checking the computer system, loading application software, writing data to persistent storage devices, System subroutine library for hardware system-related functions such as printing data. In this way, programmers can easily develop applications to use computers. This is why Wikipedia's operating system timeline [#OSTIMELINE]_ article positioned the LEO I 'Lyons Electronic Office' software system (actually, the subroutine library related to the hardware system) as the initial (1951) cause for an operating system. Such a computer system only supports the operation of one application and may be called as a dedicated computer system. On September 5, 1951, computers first executed an application called Bakeries Valuations, and later took on the task of calculating payroll, which had to be done timely because employees had to be paid their weekly wages on time. The task of calculating employee salaries, which would have taken an experienced clerk 8 minutes to complete, was accomplished by the LEO I in 1.5 seconds, 320 times faster. It provoked a sensation in British society at the time.
+   With the convenient and effective subroutine concept and subroutine calling mechanism, software developers have developed a large number of subroutine libraries on the EDSAC computer, including checking the computer system, loading application software, writing data to persistent storage devices, System subroutine library for hardware system-related functions such as printing data. In this way, programmers can easily develop applications to use computers. This is why Wikipedia's operating system timeline [#OSTIMELINE]_ article positioned the LEO I 'Lyons Electronic Office' software system (actually, the subroutine library related to the hardware system) as the starting point (1951) of an operating system. Such a computer system only supports the operation of one application and may be called as a dedicated computer system. On September 5, 1951, computers first executed an application called Bakeries Valuations, and later took on the task of calculating payroll, which had to be done timely because employees had to be paid their weekly wages on time. The task of calculating employee salaries, which would have taken an experienced clerk 8 minutes to complete, was accomplished by the LEO I in 1.5 seconds, 320 times faster. It provoked a sensation in British society at the time.
 
    Even now, there are a large number of simple embedded operating systems in the form of subroutine libraries, running on many microcontrollers based on Microcontroller Unit (MCU), and supporting simple applications or even single applications. These systems widely exists in toys, game consoles, small household appliances and other fields.
 
@@ -93,12 +93,18 @@ The goal of this chapter is still just to make the application output the ``Hell
 
 
 
-实践体验
+.. 实践体验
+
+Practical Experience
 ---------------------------
 
-本章设计实现了一个支持显示字符串应用的简单操作系统--“三叶虫”操作系统 -- LibOS，它的形态就是一个函数库，给应用程序提供了显示字符串的函数。
+This chapter designs and implements a simple operating system that supports the application of displaying strings -- "Trilobite" operating system -- LibOS. Its form is a function library that provides functions for displaying strings for applications.
 
-获取本章代码：
+
+To get the code for this chapter: 
+.. 本章设计实现了一个支持显示字符串应用的简单操作系统--“三叶虫”操作系统 -- LibOS，它的形态就是一个函数库，给应用程序提供了显示字符串的函数。
+
+.. 获取本章代码：
 
 .. code-block:: console
 
@@ -106,7 +112,10 @@ The goal of this chapter is still just to make the application output the ``Hell
    $ cd rCore-Tutorial-v3
    $ git checkout ch1
 
-在 Qemu 模拟器上运行本章代码，看看一个小应用程序是如何在Qemu模拟的计算机上运行的：
+
+Run the code in this chapter on the Qemu emulator to see how a small application runs on a Qemu-emulated computer: 
+
+.. 在 Qemu 模拟器上运行本章代码，看看一个小应用程序是如何在Qemu模拟的计算机上运行的：
 
 .. code-block:: console
 
@@ -114,7 +123,9 @@ The goal of this chapter is still just to make the application output the ``Hell
    $ make run
 
 
-如果顺利的话，以 Qemu 平台为例，将输出：
+If all goes well, the output will be in Qemu platform:
+
+.. 如果顺利的话，以 Qemu 平台为例，将输出：
 
 .. code-block::
 
@@ -127,12 +138,19 @@ The goal of this chapter is still just to make the application output the ``Hell
     .bss [0x80213000, 0x80213000)
     Panicked at src/main.rs:46 Shutdown machine!
 
-除了 ``Hello, world!`` 之外还有一些额外的动态运行信息，最后是应用程序和操作系统运行结束，Qemu模拟的计算机执行了关机操作。
 
-本章代码树
+In addition to ``Hello, world!``, there are some additional dynamic runtime information. Finally, the application program and the operating system finish their executions, and the computer simulated by Qemu performs a shutdown operation.
+
+.. 除了 ``Hello, world!`` 之外还有一些额外的动态运行信息，最后是应用程序和操作系统运行结束，Qemu模拟的计算机执行了关机操作。
+
+.. 本章代码树
+
+This Chapter Code Structure
 ------------------------------------------------
 
-三叶虫LibOS操作系统的总体结构如下图所示：
+The overall structure of the Trilobite LibOS operating system is shown in the figure below:
+
+.. 三叶虫LibOS操作系统的总体结构如下图所示：
 
 .. image:: ../../os-lectures/lec2/figs/lib-os-detail.png
    :align: center
@@ -140,11 +158,17 @@ The goal of this chapter is still just to make the application output the ``Hell
    :name: lib-os-detail
    :alt: LibOS总体结构
 
-通过上图，大致可以看出Qemu把包含app和三叶虫LibOS的image镜像加载到内存中，RustSBI（bootloader）完成基本的硬件初始化后，跳转到三叶虫LibOS起始位置，三叶虫LibOS首先进行app执行前的初始化工作，即建立栈空间和清零bss段，然后跳转到app去执行。app在执行过程中，会通过函数调用的方式得到三叶虫LibOS提供的OS服务，如输出字符串等，避免了app与硬件直接交互的繁琐过程。
+From the above figure, it can be roughly seen that Qemu loads the image containing app and Trilobite LibOS into the memory. After RustSBI (bootloader) completes the basic hardware initialization, it jumps to the starting position of Trilobite LibOS. Trilobite LibOS first initializes the app before execution, that is, establishes the stack space and clears the bss segment, and then jumps to the app to execute. During the execution of the app, it will be offered the OS services provided by Trilobite LibOS through function calls, such as outputting strings, etc. This avoids the cumbersome direct interaction between the app and the hardware. 
 
-注: 图中的S-Mode和M-Mode是RISC-V 处理器架构中的两种特权级别。S-Mode 指的是 Supervisor 模式，是操作系统使用的特权级别，可执行特权指令等。M-Mode是 Machine模式，其特权级别比S-Mode还高，可以访问RISC-V处理器中的所有系统资源。关于特权级的进一步描述可以看第二章的  :doc:`../chapter2/1rv-privilege` 中的详细说明。
+Note: S-Mode and M-Mode in the figure are two privilege levels in the RISC-V processor architecture. S-Mode refers to the Supervisor mode, which is the privilege level used by the operating system, and can execute privileged instructions, etc. M-Mode is a Machine mode with a higher privilege level than S-Mode and can access all system resources in the RISC-V processor. For further description of the privilege level, please refer to the detailed description in :doc:`../chapter2/1rv-privilege` in Chapter 2.
 
-位于 ``ch1`` 分支上的三叶虫LibOS操作系统的源代码如下所示：
+The source code of the Trilobite LibOS operating system located on the ``ch1`` branch is as follows:
+
+.. 通过上图，大致可以看出Qemu把包含app和三叶虫LibOS的image镜像加载到内存中，RustSBI（bootloader）完成基本的硬件初始化后，跳转到三叶虫LibOS起始位置，三叶虫LibOS首先进行app执行前的初始化工作，即建立栈空间和清零bss段，然后跳转到app去执行。app在执行过程中，会通过函数调用的方式得到三叶虫LibOS提供的OS服务，如输出字符串等，避免了app与硬件直接交互的繁琐过程。
+
+.. 注: 图中的S-Mode和M-Mode是RISC-V 处理器架构中的两种特权级别。S-Mode 指的是 Supervisor 模式，是操作系统使用的特权级别，可执行特权指令等。M-Mode是 Machine模式，其特权级别比S-Mode还高，可以访问RISC-V处理器中的所有系统资源。关于特权级的进一步描述可以看第二章的  :doc:`../chapter2/1rv-privilege` 中的详细说明。
+
+.. 位于 ``ch1`` 分支上的三叶虫LibOS操作系统的源代码如下所示：
 
 .. code-block::
 
@@ -152,37 +176,70 @@ The goal of this chapter is still just to make the application output the ``Hell
    Rust        4 Files   119 Lines
    Assembly    1 Files    11 Lines
 
-   ├── bootloader(内核依赖的运行在 M 特权级的 SBI 实现，本项目中我们使用 RustSBI) 
-   │   └── rustsbi-qemu.bin(可运行在 qemu 虚拟机上的预编译二进制版本)
+   ├── bootloader(the SBI implementation, dependent by the kernel and running in M-Mode priviledge level. We use RustSBI in this project. )
+   │   └── rustsbi-qemu.bin(precompiled binaries that can run on the qemu emulator)
    ├── LICENSE
-   ├── os(我们的内核实现放在 os 目录下)
-   │   ├── Cargo.toml(内核实现的一些配置文件)
+   ├── os(Our kernel implementation is placed in this os directory)
+   │   ├── Cargo.toml(Some configuration files implemented by the kernel)
    │   ├── Makefile
-   │   └── src(所有内核的源代码放在 os/src 目录下)
-   │       ├── console.rs(将打印字符的 SBI 接口进一步封装实现更加强大的格式化输出)
-   │       ├── entry.asm(设置内核执行环境的的一段汇编代码)
-   │       ├── lang_items.rs(需要我们提供给 Rust 编译器的一些语义项，目前包含内核 panic 时的处理逻辑)
-   │       ├── linker-qemu.ld(控制内核内存布局的链接脚本以使内核运行在 qemu 虚拟机上)
-   │       ├── main.rs(内核主函数)
-   │       └── sbi.rs(调用底层 SBI 实现提供的 SBI 接口)
+   │   └── src(all source codes are placed under os/src directory)
+   │       ├── console.rs(Further encapsulate the SBI interface of printing characters to achieve more powerful formatted output)
+   │       ├── entry.asm(A piece of assembly code that sets up the kernel execution environment)
+   │       ├── lang_items.rs(Some lang items that we need to provide to the Rust compiler, currently include the processing logic when the kernel panics)
+   │       ├── linker-qemu.ld(A linker script that controls the kernel memory layout to make the kernel run on the qemu emulator machine)
+   │       ├── main.rs(kernel main function)
+   │       └── sbi.rs(the SBI interface provided by the underlying SBI implementation)
    ├── README.md
-   └── rust-toolchain(控制整个项目的工具链版本)
+   └── rust-toolchain(Control the toolchain version for the entire project)
+
+.. .. code-block::
+
+..    ./os/src
+..    Rust        4 Files   119 Lines
+..    Assembly    1 Files    11 Lines
+
+..    ├── bootloader(内核依赖的运行在 M 特权级的 SBI 实现，本项目中我们使用 RustSBI) 
+..    │   └── rustsbi-qemu.bin(可运行在 qemu 虚拟机上的预编译二进制版本)
+..    ├── LICENSE
+..    ├── os(我们的内核实现放在 os 目录下)
+..    │   ├── Cargo.toml(内核实现的一些配置文件)
+..    │   ├── Makefile
+..    │   └── src(所有内核的源代码放在 os/src 目录下)
+..    │       ├── console.rs(将打印字符的 SBI 接口进一步封装实现更加强大的格式化输出)
+..    │       ├── entry.asm(设置内核执行环境的的一段汇编代码)
+..    │       ├── lang_items.rs(需要我们提供给 Rust 编译器的一些语义项，目前包含内核 panic 时的处理逻辑)
+..    │       ├── linker-qemu.ld(控制内核内存布局的链接脚本以使内核运行在 qemu 虚拟机上)
+..    │       ├── main.rs(内核主函数)
+..    │       └── sbi.rs(调用底层 SBI 实现提供的 SBI 接口)
+..    ├── README.md
+..    └── rust-toolchain(控制整个项目的工具链版本)
 
 .. note::
    
-    :doc:`../appendix-c/index` 中可以找到关于 RustSBI 的更多信息。
+    :doc:`../appendix-c/index` where more information on RustSBI can be found. 
 
 
-本章代码导读
+
+.. 本章代码导读
+
+Chapter Code Guide
 -----------------------------------------------------
 
-LibOS操作系统虽然是软件，但它不是运行在通用操作系统（如Linux）上的一般应用软件，而是运行在裸机执行环境中的系统软件。如果采用通常的应用编程方法和编译手段，无法开发出这样的操作系统。其中一个重要的原因是：编译器（Rust 编译器和 C 编译器等）编译出的应用软件在缺省情况下是要链接标准库，而标准库是依赖于操作系统（如 Linux、Windows 等）的，但LibOS操作系统不依赖其他操作系统。所以，本章主要是让同学能够脱离常规应用软件开发的思路，理解如何开发没有操作系统支持的操作系统内核。
+Although the LibOS operating system is software, it is not a general application software running on a general-purpose operating system (such as Linux), but a system software running in a bare-metal execution environment. Such an operating system cannot be developed if the usual application programming methods and compiling methods are adopted. One of the important reasons is: the application software compiled by the compiler (Rust compiler and C compiler, etc.) is to link the standard library by default, and the standard library depends on the operating system (such as Linux, Windows, etc.) Yes. But the LibOS operating system does not depend on other operating systems. Therefore, this chapter is mainly to enable students to jump out of the conventional application software development ideas and understand how to develop an operating system kernel without operating system support.
 
-为了做到这一步，首先需要写出不需要标准库的软件并通过编译。为此，先把一般应用所需要的标准库的组件给去掉，这会导致编译失败。然后再逐步添加不需要操作系统的极少的运行时支持代码，让编译器能够正常编译出不需要标准库的正常程序。但此时的程序没有显示输出，更没有输入等，但可以正常通过编译，这样就打下 **可正常编译OS** 的前期开发基础。具体可看 :ref:`移除标准库依赖 <term-remove-std>` 一节的内容。
+.. LibOS操作系统虽然是软件，但它不是运行在通用操作系统（如Linux）上的一般应用软件，而是运行在裸机执行环境中的系统软件。如果采用通常的应用编程方法和编译手段，无法开发出这样的操作系统。其中一个重要的原因是：编译器（Rust 编译器和 C 编译器等）编译出的应用软件在缺省情况下是要链接标准库，而标准库是依赖于操作系统（如 Linux、Windows 等）的，但LibOS操作系统不依赖其他操作系统。所以，本章主要是让同学能够脱离常规应用软件开发的思路，理解如何开发没有操作系统支持的操作系统内核。
 
-LibOS内核主要在 Qemu 模拟器上运行，它可以模拟一台 64 位 RISC-V 计算机。为了让LibOS内核能够正确对接到 Qemu 模拟器上，需要了解 Qemu 模拟器的启动流程，还需要一些程序内存布局和编译流程（特别是链接）相关知识，这样才能将LibOS内核加载到正确的内存位置上，并使得它能够在 Qemu 上正常运行。为了确认内核被加载到正确的内存位置，我们会在LibOS内核中手写一条汇编指令，并使用 GDB 工具监控 Qemu 的执行流程确认这条指令被正确执行。具体可以参考 :doc:`/chapter1/3first-instruction-in-kernel1` 和 :doc:`/chapter1/4first-instruction-in-kernel2` 两节。
+In order to do this, you first need to write software that does not require the standard library and compile it. For this reason, first remove the components of the standard library required by general applications, which will cause compilation failures. Then gradually add very little runtime support code that does not require an operating system, so that the compiler can normally compile a normal program that does not require a standard library. But the program at this time does not display output, let alone input, etc., but it can be compiled normally, thus laying the foundation for the early development of OS that **can normally compile**. See :ref:`Remove standard library dependencies <term-remove-std>` for details.
 
-我们想用 Rust 语言来实现内核的大多数功能，因此我们需要进一步将控制权从第一条指令转交给 Rust 入口函数。在 Rust 代码中，函数调用是不可或缺的基本控制流，为了使得函数调用能够正常进行，我们在跳转到 Rust 入口函数前还需要进行栈的初始化工作。为此我们详细介绍了函数调用和栈的相关背景知识，具体内容可参考 :doc:`/chapter1/5support-func-call` 一节。最终，我们调用软件栈中相比内核更低一层的软件——也即 RustSBI 提供的服务来实现格式化输出和遇到致命错误时的关机功能，形成了LibOS的核心功能，详情参考 :doc:`/chapter1/6print-and-shutdown-based-on-sbi` 一节。至此，应用程序可以直接调用LibOS提供的字符串输出函数或关机函数，达到让应用与硬件隔离的操作系统目标。
+.. 为了做到这一步，首先需要写出不需要标准库的软件并通过编译。为此，先把一般应用所需要的标准库的组件给去掉，这会导致编译失败。然后再逐步添加不需要操作系统的极少的运行时支持代码，让编译器能够正常编译出不需要标准库的正常程序。但此时的程序没有显示输出，更没有输入等，但可以正常通过编译，这样就打下 **可正常编译OS** 的前期开发基础。具体可看 :ref:`移除标准库依赖 <term-remove-std>` 一节的内容。
+
+The LibOS kernel runs primarily on the Qemu emulator, which emulates a 64-bit RISC-V computer. In order to connect the LibOS kernel to the Qemu emulator correctly, you need to understand the startup process of the Qemu emulator, and also need some knowledge about the program memory layout and compilation process (especially the link), so that the LibOS kernel can be loaded into the correct memory location and make it work properly on Qemu. In order to confirm that the kernel is loaded into the correct memory location, we will hand-write an assembly instruction in the LibOS kernel, and use the GDB tool to monitor the execution flow of Qemu to confirm that this instruction is executed correctly. For details, please refer to :doc:`/chapter1/3first-instruction-in-kernel1` and :doc:`/chapter1/4first-instruction-in-kernel2`.
+
+.. LibOS内核主要在 Qemu 模拟器上运行，它可以模拟一台 64 位 RISC-V 计算机。为了让LibOS内核能够正确对接到 Qemu 模拟器上，需要了解 Qemu 模拟器的启动流程，还需要一些程序内存布局和编译流程（特别是链接）相关知识，这样才能将LibOS内核加载到正确的内存位置上，并使得它能够在 Qemu 上正常运行。为了确认内核被加载到正确的内存位置，我们会在LibOS内核中手写一条汇编指令，并使用 GDB 工具监控 Qemu 的执行流程确认这条指令被正确执行。具体可以参考 :doc:`/chapter1/3first-instruction-in-kernel1` 和 :doc:`/chapter1/4first-instruction-in-kernel2` 两节。
+
+We want to implement most of the kernel's functionality in Rust, so we need to move the control further from the first instruction to the Rust entry function. In Rust code, function calls are an indispensable basic control flow. In order to make function calls work normally, we need to initialize the stack before jumping to the Rust entry function. For this reason, we introduce the relevant background knowledge of function calls and stacks in detail. For details, please refer to the section :doc:`/chapter1/5support-func-call`. In the end, we call the software at a lower level than the kernel in the software stack —- that is, the services provided by RustSBI to implement formatted output and shutdown functions when encountering fatal errors. It constitutes the core functions of LibOS. For details, refer to :doc:`/chapter1/6print-and-shutdown-based-on-sbi` section. So far, the application program can directly call the string output function or shutdown function provided by LibOS. It achieves the operating system goal of isolating the application from the hardware.
+
+.. 我们想用 Rust 语言来实现内核的大多数功能，因此我们需要进一步将控制权从第一条指令转交给 Rust 入口函数。在 Rust 代码中，函数调用是不可或缺的基本控制流，为了使得函数调用能够正常进行，我们在跳转到 Rust 入口函数前还需要进行栈的初始化工作。为此我们详细介绍了函数调用和栈的相关背景知识，具体内容可参考 :doc:`/chapter1/5support-func-call` 一节。最终，我们调用软件栈中相比内核更低一层的软件——也即 RustSBI 提供的服务来实现格式化输出和遇到致命错误时的关机功能，形成了LibOS的核心功能，详情参考 :doc:`/chapter1/6print-and-shutdown-based-on-sbi` 一节。至此，应用程序可以直接调用LibOS提供的字符串输出函数或关机函数，达到让应用与硬件隔离的操作系统目标。
 
 
 .. 操作系统代码无法像应用软件那样，可以有方便的调试（Debug）功能。这是因为应用之所以能够被调试，也是由于操作系统提供了方便的调试相关的系统调用。而我们不得不再次认识到，需要运行在没有操作系统的裸机环境中，当然没法采用依赖操作系统的传统调试方法了。所以，我们只能采用 ``print`` 这种原始且有效的调试方法。这样，第二步就是让脱离了标准库的软件有输出，这样，我们就能看到程序的运行情况了。为了简单起见，我们可以先在用户态尝试构建没有标准库的支持显示输出的最小运行时执行环境，比较特别的地方在于如何写内嵌汇编调用更为底层的输出接口来实现这一功能。具体可看 :ref:`构建用户态执行环境 <term-print-userminienv>` 一节的内容。
