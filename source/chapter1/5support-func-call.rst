@@ -391,19 +391,23 @@ This can set our default compilation target, adjust the compilation options, set
     ld	s0, 48(sp)
     # Deallocate the stack
     addi	sp, sp, 64
-    # 返回，使用 ret 指令或其他等价的实现方式
+    # return , using ret instruction or other likewise approaches
     ret    
 
-So far, we have basically explained how function calls are implemented based on the stack. However, we can ignore these details for the time being, because we only need to configure the stack in the initialization phase, that is, set the stack pointer ``sp`` register, and the compiler will help us automatically complete the code generation of the following function call-related mechanisms. But the trouble is, the value of ``sp`` cannot be set casually. At least we need to ensure that it points to legal physical memory, and it cannot intersect with other code and data segments of the program, because during the function call, the stack area content will be modified. How to ensure this?
+So far, we have basically explained how function calls are implemented based on the stack. However, we can ignore these details for the time being, because we only need to configure the stack in the initialization phase, that is, set the stack pointer ``sp`` register, and the compiler will help us automatically complete the code generation of the following function call-related mechanisms. But the trouble is, the value of ``sp`` cannot be set casually. At least we need to ensure that it points to legal physical memory, and it cannot intersect with other code and data segments of the program. It is because during the function call, the stack area content will be modified. How to ensure this?
 
 .. 至此，我们基本上说明了函数调用是如何基于栈来实现的。不过我们可以暂时先忽略掉这些细节，因为我们现在只是需要在初始化阶段完成栈的设置，也就是设置好栈指针 ``sp`` 寄存器，编译器会帮我们自动完成后面的函数调用相关机制的代码生成。麻烦的是， ``sp`` 的值也不能随便设置，至少我们需要保证它指向合法的物理内存，而且不能与程序的其他代码、数据段相交，因为在函数调用的过程中，栈区域里面的内容会被修改。如何保证这一点呢？
 
 .. _jump-practice:
 
-分配并使用启动栈
+.. 分配并使用启动栈
+
+Allocate and Use Bootstrap Stack
 -------------------------------------------
 
-我们在 ``entry.asm`` 中分配启动栈空间，并在控制权被转交给 Rust 入口之前将栈指针 ``sp`` 设置为栈顶的位置。
+We allocate the boostrap stack space in ``entry.asm`` and set the stack pointer ``sp`` to the location of the top of the stack before control is passed to the Rust entry.
+
+.. 我们在 ``entry.asm`` 中分配启动栈空间，并在控制权被转交给 Rust 入口之前将栈指针 ``sp`` 设置为栈顶的位置。
 
 .. code-block:: asm
     :linenos:
@@ -422,11 +426,15 @@ So far, we have basically explained how function calls are implemented based on 
         .globl boot_stack_top
     boot_stack_top:
 
-我们在第 11 行在内核的内存布局中预留了一块大小为 4096 * 16 字节也就是 :math:`64\text{KiB}` 的空间用作接下来要运行的程序的栈空间。在 RISC-V 架构上，栈是从高地址向低地址增长。因此，最开始的时候栈为空，栈顶和栈底位于相同的位置，我们用更高地址的符号 ``boot_stack_top`` 来标识栈顶的位置。同时，我们用更低地址的符号 ``boot_stack_lower_bound`` 来标识栈能够增长到的下限位置，它们都被设置为全局符号供其他目标文件使用。如下图所示：
+We reserve a space of 4096 * 16 bytes in the memory layout of the kernel in line 11, which is :math:`64\text{KiB}`, which is used as the stack space for the program to run. On the RISC-V architecture, the stack grows from high addresses to low addresses. Therefore, the stack is empty at the beginning, and the top and bottom of the stack are at the same location. We use the higher address symbol ``boot_stack_top`` to identify the location of the stack top. At the same time, we use the lower address symbol ``boot_stack_lower_bound`` to identify the lower limit where the stack can grow, and they are all set as global symbols for use by other object files. As shown below:
+
+.. 我们在第 11 行在内核的内存布局中预留了一块大小为 4096 * 16 字节也就是 :math:`64\text{KiB}` 的空间用作接下来要运行的程序的栈空间。在 RISC-V 架构上，栈是从高地址向低地址增长。因此，最开始的时候栈为空，栈顶和栈底位于相同的位置，我们用更高地址的符号 ``boot_stack_top`` 来标识栈顶的位置。同时，我们用更低地址的符号 ``boot_stack_lower_bound`` 来标识栈能够增长到的下限位置，它们都被设置为全局符号供其他目标文件使用。如下图所示：
 
 .. image:: boot_stack.png
     
-第 8 行可以看到我们将这块空间放置在一个名为 ``.bss.stack`` 的段中，在链接脚本 ``linker.ld`` 中可以看到 ``.bss.stack`` 段最终会被汇集到 ``.bss`` 段中：
+From line 8, we can see that we put this space in a section called ``.bss.stack``. And from the linker script ``linker.ld``, you can see ``.bss.stack`` is included into the ``.bss`` section:
+
+.. 第 8 行可以看到我们将这块空间放置在一个名为 ``.bss.stack`` 的段中，在链接脚本 ``linker.ld`` 中可以看到 ``.bss.stack`` 段最终会被汇集到 ``.bss`` 段中：
 
 .. code-block::
 
@@ -438,9 +446,13 @@ So far, we have basically explained how function calls are implemented based on 
     }
     ebss = .;
 
-前面我们提到过 ``.bss`` 段一般放置需要被初始化为零的数据。然而栈并不需要在使用前被初始化为零，因为在函数调用的时候我们会插入栈帧覆盖已有的数据。我们尝试将其放置到全局数据 ``.data`` 段中但最后未能成功，因此才决定将其放置到 ``.bss`` 段中。全局符号 ``sbss`` 和 ``ebss`` 分别指向 ``.bss`` 段除 ``.bss.stack`` 以外的起始和终止地址，我们在使用这部分数据之前需要将它们初始化为零，这个过程将在下一节进行。
+We mentioned earlier that the ``.bss`` section generally holds data that needs to be initialized to zero. However, the stack does not need to be initialized to zero before use, because when the function is called, we will insert the stack frame to overwrite the existing data. We tried and failed to place it in the global data ``.data`` section, so we decided to put it in the ``.bss`` section. The global symbols ``sbss`` and ``ebss`` respectively point to the start and end addresses of the ``.bss`` section except ``.bss.stack``. So we need to initialize them before using this part of data to zero, this process will be carried out in the next section.
 
-回到 ``entry.asm`` ，可以发现在控制权转交给 Rust 入口之前会执行两条指令，它们分别位于 ``entry.asm`` 的第 5、6 行。第 5 行我们将栈指针 ``sp`` 设置为先前分配的启动栈栈顶地址，这样 Rust 代码在进行函数调用和返回的时候就可以正常在启动栈上分配和回收栈帧了。在我们设计好的内存布局中，这块启动栈所用的内存并不会和内核的其他代码、数据段产生冲突，它们是从物理上隔离的。然而如果启动栈溢出（比如在内核代码中出现了太多的函数调用），那么分配的栈帧将有可能覆盖内核其他部分的代码、数据从而出现十分诡异的错误。目前我们只能尽量避免栈溢出的情况发生，到了第四章，借助地址空间抽象和 MMU 硬件的帮助，我们可以做到完全禁止栈溢出。第 6 行我们通过伪指令 ``call`` 调用 Rust 编写的内核入口点 ``rust_main`` 将控制权转交给 Rust 代码，该入口点在 ``main.rs`` 中实现：
+.. 前面我们提到过 ``.bss`` 段一般放置需要被初始化为零的数据。然而栈并不需要在使用前被初始化为零，因为在函数调用的时候我们会插入栈帧覆盖已有的数据。我们尝试将其放置到全局数据 ``.data`` 段中但最后未能成功，因此才决定将其放置到 ``.bss`` 段中。全局符号 ``sbss`` 和 ``ebss`` 分别指向 ``.bss`` 段除 ``.bss.stack`` 以外的起始和终止地址，我们在使用这部分数据之前需要将它们初始化为零，这个过程将在下一节进行。
+
+Back to ``entry.asm``, we can find that two instructions are executed before the control is transferred to the Rust entry, which are located on lines 5 and 6 of ``entry.asm``. In line 5, we set the stack pointer ``sp`` to the previously allocated boostrap stack top address, so that the Rust code can normally allocate and reclaim stack frames on the bootstrap stack when making function calls and returns. In our designed memory layout, the memory used by the boostrap stack will not conflict with other code and data segments of the kernel, and they are physically isolated. However, if the boostrap stack is overflowed (for example, too many function calls appear in the kernel code), then the allocated stack frame may overwrite the code and data of other parts of the kernel, resulting in very strange errors. At present, we can only try to avoid the occurrence of stack overflow. In Chapter 4, with the help of address space abstraction and MMU hardware, we can completely prohibit stack overflow. On line 6, we transfer control to the Rust code by calling the kernel entry point ``rust_main`` written in Rust with the pseudo-instruction ``call``, which is implemented in ``main.rs``:
+
+.. 回到 ``entry.asm`` ，可以发现在控制权转交给 Rust 入口之前会执行两条指令，它们分别位于 ``entry.asm`` 的第 5、6 行。第 5 行我们将栈指针 ``sp`` 设置为先前分配的启动栈栈顶地址，这样 Rust 代码在进行函数调用和返回的时候就可以正常在启动栈上分配和回收栈帧了。在我们设计好的内存布局中，这块启动栈所用的内存并不会和内核的其他代码、数据段产生冲突，它们是从物理上隔离的。然而如果启动栈溢出（比如在内核代码中出现了太多的函数调用），那么分配的栈帧将有可能覆盖内核其他部分的代码、数据从而出现十分诡异的错误。目前我们只能尽量避免栈溢出的情况发生，到了第四章，借助地址空间抽象和 MMU 硬件的帮助，我们可以做到完全禁止栈溢出。第 6 行我们通过伪指令 ``call`` 调用 Rust 编写的内核入口点 ``rust_main`` 将控制权转交给 Rust 代码，该入口点在 ``main.rs`` 中实现：
 
 .. code-block:: rust
 
@@ -450,9 +462,14 @@ So far, we have basically explained how function calls are implemented based on 
         loop {}
     }
 
-这里需要注意的是需要通过宏将 ``rust_main`` 标记为 ``#[no_mangle]`` 以避免编译器对它的名字进行混淆，不然在链接的时候， ``entry.asm`` 将找不到 ``main.rs`` 提供的外部符号 ``rust_main`` 从而导致链接失败。在 ``rust_main`` 函数的开场白中，我们将第一次在栈上分配栈帧并保存函数调用上下文，它也是内核运行全程中最底层的栈帧。
+It should be noted here that ``rust_main`` needs to be marked as ``#[no_mangle]`` through a macro to avoid the compiler from confusing its name. Otherwise when linking, ``entry.asm`` will be unable to find external symbol ``rust_main`` provided by ``main.rs``, causing link failure. In the prologue of the ``rust_main`` function, we will allocate a stack frame on the stack for the first time and save the function call context, which is also the lowest stack frame in the whole process of the kernel running.
 
-在内核初始化中，需要先完成对 ``.bss`` 段的清零。这是内核很重要的一部分初始化工作，在使用任何被分配到 ``.bss`` 段的全局变量之前我们需要确保 ``.bss`` 段已被清零。我们就在 ``rust_main`` 的开头完成这一工作，由于控制权已经被转交给 Rust ，我们终于不用手写汇编代码而是可以用 Rust 来实现这一功能了：
+In the kernel initialization, it is necessary to clear the ``.bss`` section first. This is an important part of the initialization of the kernel. Before using any global variables allocated to the ``.bss`` section, we need to ensure that the ``.bss`` section has been cleared. We do this right at the beginning of ``rust_main``. And since control has been transferred to Rust, we can finally implement this functionality in Rust instead of writing assembly code by hand:
+
+
+.. 这里需要注意的是需要通过宏将 ``rust_main`` 标记为 ``#[no_mangle]`` 以避免编译器对它的名字进行混淆，不然在链接的时候， ``entry.asm`` 将找不到 ``main.rs`` 提供的外部符号 ``rust_main`` 从而导致链接失败。在 ``rust_main`` 函数的开场白中，我们将第一次在栈上分配栈帧并保存函数调用上下文，它也是内核运行全程中最底层的栈帧。
+
+.. 在内核初始化中，需要先完成对 ``.bss`` 段的清零。这是内核很重要的一部分初始化工作，在使用任何被分配到 ``.bss`` 段的全局变量之前我们需要确保 ``.bss`` 段已被清零。我们就在 ``rust_main`` 的开头完成这一工作，由于控制权已经被转交给 Rust ，我们终于不用手写汇编代码而是可以用 Rust 来实现这一功能了：
 
 .. code-block:: rust
     :linenos:
@@ -474,19 +491,29 @@ So far, we have basically explained how function calls are implemented based on 
         });
     }
 
-在函数 ``clear_bss`` 中，我们会尝试从其他地方找到全局符号 ``sbss`` 和 ``ebss`` ，它们由链接脚本 ``linker.ld`` 给出，并分别指出需要被清零的 ``.bss`` 段的起始和终止地址。接下来我们只需遍历该地址区间并逐字节进行清零即可。
+In the function ``clear_bss``, we will try to find the global symbols ``sbss`` and ``ebss`` from other places, which are given by the linker script ``linker.ld``. And we indicate the starting and ending address of the ``.bss`` section, in between data to clear. Next, we only need to traverse the address range and clear byte by byte.
+
+.. 在函数 ``clear_bss`` 中，我们会尝试从其他地方找到全局符号 ``sbss`` 和 ``ebss`` ，它们由链接脚本 ``linker.ld`` 给出，并分别指出需要被清零的 ``.bss`` 段的起始和终止地址。接下来我们只需遍历该地址区间并逐字节进行清零即可。
 
 .. note::
 
-    **Rust Tips：外部符号引用**
+    **Rust Tips: External Symbol References**
 
-    extern "C" 可以引用一个外部的 C 函数接口（这意味着调用它的时候要遵从目标平台的 C 语言调用规范）。但我们这里只是引用位置标志并将其转成 usize 获取它的地址。由此可以知道 ``.bss`` 段两端的地址。
+    extern "C" can refer to an external C function interface (this means that when calling it, it must follow the C language calling convention of the target platform). But here we just refer to the location flag and turn it into usize to get its address. From this, we can know the addresses of both ends of the ``.bss`` segment.
+
+    .. **Rust Tips：外部符号引用**
+
+    .. extern "C" 可以引用一个外部的 C 函数接口（这意味着调用它的时候要遵从目标平台的 C 语言调用规范）。但我们这里只是引用位置标志并将其转成 usize 获取它的地址。由此可以知道 ``.bss`` 段两端的地址。
 
 .. note::
 
-    **Rust Tips：迭代器与闭包**
+    **Rust Tips: Iterators and Closures**
 
-    代码第 13 行用到了 Rust 的迭代器与闭包的语法，它们在很多情况下能够提高开发效率。如读者感兴趣的话也可以将其改写为等价的 for 循环实现。
+    Line 13 of the code uses Rust's iterator and closure syntax, which can improve development efficiency in many cases. This can also be rewritten as an equivalent for loop implementation if the reader is interested.
+
+    .. **Rust Tips：迭代器与闭包**
+
+    .. 代码第 13 行用到了 Rust 的迭代器与闭包的语法，它们在很多情况下能够提高开发效率。如读者感兴趣的话也可以将其改写为等价的 for 循环实现。
 
 .. _term-raw-pointer:
 .. _term-dereference:
@@ -495,10 +522,18 @@ So far, we have basically explained how function calls are implemented based on 
 
     **Rust Tips：Unsafe**
 
-    代码第 14 行，我们将 ``.bss`` 段内的一个地址转化为一个 **裸指针** (Raw Pointer)，并将它指向的值修改为 0。这在 C 语言中是一种司空见惯的操作，但在 Rust 中我们需要将他包裹在 unsafe 块中。这是因为，Rust 认为对于裸指针的 **解引用** (Dereference) 是一种 unsafe 行为。
+    On line 14 of the code, we convert an address in the ``.bss`` segment into a **raw pointer**, and modify the value it points to to 0. This is a commonplace operation in C, but in Rust we need to wrap it in an unsafe block. This is because Rust considers **Dereference** (Dereference) for raw pointers to be an unsafe behavior.
 
-    相比 C 语言，Rust 进行了更多的语义约束来保证安全性（内存安全/类型安全/并发安全），这在编译期和运行期都有所体现。但在某些时候，尤其是与底层硬件打交道的时候，在 Rust 的语义约束之内没法满足我们的需求，这个时候我们就需要将超出了 Rust 语义约束的行为包裹在 unsafe 块中，告知编译器不需要对它进行完整的约束检查，而是由程序员自己负责保证它的安全性。当代码不能正常运行的时候，我们往往也是最先去检查 unsafe 块中的代码，因为它没有受到编译器的保护，出错的概率更大。
+    .. 代码第 14 行，我们将 ``.bss`` 段内的一个地址转化为一个 **裸指针** (Raw Pointer)，并将它指向的值修改为 0。这在 C 语言中是一种司空见惯的操作，但在 Rust 中我们需要将他包裹在 unsafe 块中。这是因为，Rust 认为对于裸指针的 **解引用** (Dereference) 是一种 unsafe 行为。
 
-    C 语言中的指针相当于 Rust 中的裸指针，它无所不能但又太过于灵活，程序员对其不谨慎的使用常常会引起很多内存不安全问题，最常见的如悬垂指针和多次回收的问题，Rust 编译器没法确认程序员对它的使用是否安全，因此将其划到 unsafe Rust 的领域。在 safe Rust 中，我们有引用 ``&/&mut`` 以及各种功能各异的智能指针 ``Box<T>/RefCell<T>/Rc<T>`` 可以使用，只要按照 Rust 的规则来使用它们便可借助编译器在编译期就解决很多潜在的内存不安全问题。
+    Compared with C language, Rust implements more semantic constraints to ensure safety (memory safety/type safety/concurrency safety), which is reflected in both compilation and runtime. But at some point, especially when dealing with the underlying hardware, our needs cannot be met within the semantic constraints of Rust. At this time, we need to wrap the behavior beyond the semantic constraints of Rust in an unsafe block and tell the compiler that it does not need to perform a complete constraint check on it. But it is the programmer's responsibility to ensure its safety. When the code does not run normally, we are often the first to check the code in the unsafe block, because it is not protected by the compiler, and the probability of error is greater.
 
-本节我们介绍了函数调用和栈的背景知识，通过分配栈空间并正确设置栈指针在内核中使能了函数调用并成功将控制权转交给 Rust 代码，从此我们终于可以利用强大的 Rust 语言来编写内核的各项功能了。下一节中我们将进行构建“三叶虫”操作系统的最后一个步骤：即基于 RustSBI 提供的服务成功在屏幕上打印 ``Hello, world!`` 。
+    .. 相比 C 语言，Rust 进行了更多的语义约束来保证安全性（内存安全/类型安全/并发安全），这在编译期和运行期都有所体现。但在某些时候，尤其是与底层硬件打交道的时候，在 Rust 的语义约束之内没法满足我们的需求，这个时候我们就需要将超出了 Rust 语义约束的行为包裹在 unsafe 块中，告知编译器不需要对它进行完整的约束检查，而是由程序员自己负责保证它的安全性。当代码不能正常运行的时候，我们往往也是最先去检查 unsafe 块中的代码，因为它没有受到编译器的保护，出错的概率更大。
+
+    The pointer in C language is equivalent to the raw pointer in Rust. It is omnipotent but too flexible. Programmers often use it carelessly to cause many memory insecurity problems, the most common ones dangling pointers and multiple recycling. The Rust compiler cannot confirm whether programmers are safe to use it, so it is classified as unsafe Rust. In safe Rust, we have references ``&/&mut`` and various smart pointers ``Box<T>/RefCell<T>/Rc<T>`` that can be used. As long as they follow the rules of Rust To use them, the compiler can solve many potential memory insecurity problems at compile time.
+
+    .. C 语言中的指针相当于 Rust 中的裸指针，它无所不能但又太过于灵活，程序员对其不谨慎的使用常常会引起很多内存不安全问题，最常见的如悬垂指针和多次回收的问题，Rust 编译器没法确认程序员对它的使用是否安全，因此将其划到 unsafe Rust 的领域。在 safe Rust 中，我们有引用 ``&/&mut`` 以及各种功能各异的智能指针 ``Box<T>/RefCell<T>/Rc<T>`` 可以使用，只要按照 Rust 的规则来使用它们便可借助编译器在编译期就解决很多潜在的内存不安全问题。
+
+In this section, we introduced the background knowledge of function calls and stacks. By allocating stack space and setting the stack pointer correctly, we enabled function calls in the kernel and successfully transferred control to Rust code. From then on, we can finally use the powerful Rust language to write the various functions of the kernel. In the next section we will proceed to the last step of building the "Trilobite" operating system: that is, the service provided by RustSBI successfully prints ``Hello, world!`` on the screen.
+
+.. 本节我们介绍了函数调用和栈的背景知识，通过分配栈空间并正确设置栈指针在内核中使能了函数调用并成功将控制权转交给 Rust 代码，从此我们终于可以利用强大的 Rust 语言来编写内核的各项功能了。下一节中我们将进行构建“三叶虫”操作系统的最后一个步骤：即基于 RustSBI 提供的服务成功在屏幕上打印 ``Hello, world!`` 。

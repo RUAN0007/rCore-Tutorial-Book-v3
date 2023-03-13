@@ -80,13 +80,13 @@ This adjusts the behavior of the Cargo tooling in the os directory: riscv64gc is
    
    Cross-compilation is a concept corresponding to the local compilation, that is, a program compiled on one platform to run on another platform. The environment in which the program is compiled is different from the environment in which the program runs. As we will talk about later, on the Linux x86-64 development platform, write code and compile it to a program that can execute on the target platform consisting of rCore Tutorial (this is the operating system kernel we want to write) and riscv64gc (this is the CPU hardware). 
 
-   **本地编译与交叉编译** 
+   .. **本地编译与交叉编译** 
 
-   下面指的 **平台** 主要由CPU硬件和操作系统这两个要素组成。
+   .. 下面指的 **平台** 主要由CPU硬件和操作系统这两个要素组成。
 
-   本地编译，即在当前开发平台下编译出来的程序，也只是放到这个平台下运行。如在 Linux x86-64 平台上编写代码并编译成可在 Linux x86-64 同样平台上执行的程序。
+   .. 本地编译，即在当前开发平台下编译出来的程序，也只是放到这个平台下运行。如在 Linux x86-64 平台上编写代码并编译成可在 Linux x86-64 同样平台上执行的程序。
    
-   交叉编译，是一个与本地编译相对应的概念，即在一种平台上编译出在另一种平台上运行的程序。程序编译的环境与程序运行的环境不一样。如我们后续会讲到，在Linux x86-64 开发平台上，编写代码并编译成可在 rCore Tutorial（这是我们要编写的操作系统内核）和 riscv64gc（这是CPU硬件）构成的目标平台上执行的程序。
+   .. 交叉编译，是一个与本地编译相对应的概念，即在一种平台上编译出在另一种平台上运行的程序。程序编译的环境与程序运行的环境不一样。如我们后续会讲到，在Linux x86-64 开发平台上，编写代码并编译成可在 rCore Tutorial（这是我们要编写的操作系统内核）和 riscv64gc（这是CPU硬件）构成的目标平台上执行的程序。
    
 Of course, this is just a small trick so that we don't have to add the ``--target`` parameter when ``cargo build`` later. If we execute ``cargo build`` now, we will still get the error that the standard library std cannot be found as in the previous section. So we need to work through these bugs step by step as we proceed to remove the standard library.
 
