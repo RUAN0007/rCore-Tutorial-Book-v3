@@ -229,7 +229,7 @@ This can make full use of the computer system: that is, try to make the system r
 
    .. **历史的缩影 -- 泥盆纪“邓氏鱼”操作系统 -- BatchOS**
 
-   **Microcosm of History -- the Devonian "Deng's fish" operating system -- BatchOS**
+   **Microcosm of History -- the Devonian "Dunkleosteus" operating system -- BatchOS**
    
    You can see the "Dunkleosteus" operating system -- BatchOS in :ref:`Chapter 2 of this book<link-chapter2>`. Although only one application can be loaded and run at a time, BatchOS allows the applications and operating system to be connected through the hardware isolation mechanism. Isolation strengthens system security and improves execution efficiency to a certain extent.
 
