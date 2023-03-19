@@ -78,7 +78,7 @@ After the hardware has offered such a mechanism, it needs the cooperation of the
 RISC-V Privilege Architecture
 ------------------------------------------
 
-RISC-V 架构中一共定义了 4 种特权级：
+RISC-V architecture has defined a total of four privilege levels. 
 
 .. list-table:: RISC-V privilege level
     :widths: 30 30 60
@@ -175,7 +175,7 @@ Lets look back to the first chapter. At that time, only a simple library-level "
 
 .. _term-trap:
 
-Another function of the execution environment is to monitor and manage the execution of upper-layer software. Monitoring management can be understood as: when some abnormalities or special circumstances occur during the execution of the upper-layer softwares, the functions provided in the execution environment need to be triggered. So it is necessary to suspend the execution of the upper-layer softwares and run the code of the execution environment instead. Since the upper layer software and the execution environment are designed to run at different privilege levels, this process is often (but **not necessarily**) accompanied by a **privilege level switching** of the CPU. When the code in the execution environment finishes running, we need to return to the position where the upper-level software was suspended to continue the execution. In the RISC-V architecture, this **abnormal control flow** (ECF, Exception Control Flow) that is different from the conventional control flow (sequence, loop, branch, function call) is called **Exception (Exception)** , which is one of the trap types in the RISC-V context.
+Another function of the execution environment is to monitor and manage the execution of upper-layer software. Monitoring management can be understood as: when some abnormalities or special circumstances occur during the execution of the upper-layer softwares, the functions provided in the execution environment need to be triggered. So it is necessary to suspend the execution of the upper-layer softwares and run the code of the execution environment instead. Since the upper layer software and the execution environment are designed to run at different privilege levels, this process is often (but **not necessarily**) accompanied by a **privilege level switching** of the CPU. When the code in the execution environment finishes running, we need to return to the position where the upper-level software was suspended to continue the execution. In the RISC-V architecture, this Exception Control Flow, which is different from the conventional control flow (sequence, loop, branch, function call) is called **Exception (Exception)** , which is one of the trap types in the RISC-V context.
 
 .. 执行环境的另一种功能是对上层软件的执行进行监控管理。监控管理可以理解为，当上层软件执行的时候出现了一些异常或特殊情况，导致需要用到执行环境中提供的功能，因此需要暂停上层软件的执行，转而运行执行环境的代码。由于上层软件和执行环境被设计为运行在不同的特权级，这个过程也往往（而 **不一定** ）伴随着 CPU 的 **特权级切换** 。当执行环境的代码运行结束后，我们需要回到上层软件暂停的位置继续执行。在 RISC-V 架构中，这种与常规控制流（顺序、循环、分支、函数调用）不同的 **异常控制流** (ECF, Exception Control Flow) 被称为 **异常（Exception）** ，是 RISC-V 语境下的 Trap 种类之一。
 
@@ -185,7 +185,7 @@ There are generally two reasons why user mode applications directly trigger exce
 
 .. 用户态应用直接触发从用户态到内核态的异常的原因总体上可以分为两种：其一是用户态软件为获得内核态操作系统的服务功能而执行特殊指令；其二是在执行某条指令期间产生了错误（如执行了用户态不允许执行的指令或者其他错误）并被 CPU 检测到。下表中我们给出了 RISC-V 特权级规范定义的会可能导致从低特权级到高特权级的各种 **异常**：
 
-.. list-table:: RISC-V 异常一览表
+.. list-table:: RISC-V Exception Summary
    :align: center
    :header-rows: 1
    :widths: 30 30 60
@@ -251,7 +251,7 @@ Here we need to specifically explain the execution call ``ecall``, which is a ve
 
 It can be seen that under such an architecture, each level of privileged software can only do what the high-privileged software allows it to do. And nothing will shake the high-privileged software. Once the low-privileged software exceeds the scope of its ability, it must seek the help of high-privileged software. Otherwise it is an abnormal behavior. Therefore, we often see privilege level switching during software (application, operating system, etc.) execution. As shown below:
 
-可以看到，在这样的架构之下，每层特权级的软件都只能做高特权级软件允许它做的、且不会产生什么撼动高特权级软件的事情，一旦低特权级软件的要求超出了其能力范围，就必须寻求高特权级软件的帮助，否则就是一种异常行为了。因此，在软件（应用、操作系统等）执行过程中我们经常能够看到特权级切换。如下图所示：
+.. 可以看到，在这样的架构之下，每层特权级的软件都只能做高特权级软件允许它做的、且不会产生什么撼动高特权级软件的事情，一旦低特权级软件的要求超出了其能力范围，就必须寻求高特权级软件的帮助，否则就是一种异常行为了。因此，在软件（应用、操作系统等）执行过程中我们经常能够看到特权级切换。如下图所示：
 
 .. image:: EnvironmentCallFlow.png
    :align: center
