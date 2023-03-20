@@ -1,77 +1,135 @@
 .. _term-trap-handle:
 
-实现特权级的切换
-===========================
+.. 实现特权级的切换
+
+Implement the Privilege Level Switching
+======================================================
 
 .. toctree::
    :hidden:
    :maxdepth: 5
 
-本节导读
+.. 本节导读
+
+Section Guide
 -------------------------------
 
-由于处理器具有硬件级的特权级机制，应用程序在用户态特权级运行时，是无法直接通过函数调用访问处于内核态特权级的批处理操作系统内核中的函数。但应用程序又需要得到操作系统提供的服务，所以应用程序与操作系统需要通过某种合作机制完成特权级之间的切换，使得用户态应用程序可以得到内核态操作系统函数的服务。本节将讲解在 RISC-V 64 处理器提供的 U/S 特权级下，批处理操作系统和应用程序如何相互配合，完成特权级切换的。
+Since the processor has a hardware-level privilege level mechanism, when the application program is running at the user mode privilege level, it cannot directly access the functions in the batch operating system kernel at the kernel mode privilege level through function calls. However, the application program needs to obtain the services provided by the operating system, so the application program and the operating system need to complete the switching between privilege levels through a certain cooperation mechanism. So that the user mode application program can obtain the service of the kernel mode operating system services. This section will explain how the batch operating system and applications cooperate with each other to complete the privilege level switching under the U/S privilege level provided by the RISC-V 64 processor.
 
-RISC-V特权级切换
+.. 由于处理器具有硬件级的特权级机制，应用程序在用户态特权级运行时，是无法直接通过函数调用访问处于内核态特权级的批处理操作系统内核中的函数。但应用程序又需要得到操作系统提供的服务，所以应用程序与操作系统需要通过某种合作机制完成特权级之间的切换，使得用户态应用程序可以得到内核态操作系统函数的服务。本节将讲解在 RISC-V 64 处理器提供的 U/S 特权级下，批处理操作系统和应用程序如何相互配合，完成特权级切换的。
+
+.. RISC-V特权级切换
+
+RISC-V Privilege Level Switching
 ---------------------------------------
 
-特权级切换的起因
+.. 特权级切换的起因
+
+Why Need Privilege Level Switching
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-我们知道，批处理操作系统被设计为运行在内核态特权级（RISC-V 的 S 模式），这是作为 SEE（Supervisor Execution Environment）的 RustSBI 所保证的。而应用程序被设计为运行在用户态特权级（RISC-V 的 U 模式），被操作系统为核心的执行环境监管起来。在本章中，这个应用程序的执行环境即是由“邓式鱼” 批处理操作系统提供的 AEE（Application Execution Environment) 。批处理操作系统为了建立好应用程序的执行环境，需要在执行应用程序之前进行一些初始化工作，并监控应用程序的执行，具体体现在：
 
-- 当启动应用程序的时候，需要初始化应用程序的用户态上下文，并能切换到用户态执行应用程序； 
-- 当应用程序发起系统调用（即发出 Trap）之后，需要到批处理操作系统中进行处理；
-- 当应用程序执行出错的时候，需要到批处理操作系统中杀死该应用并加载运行下一个应用； 
-- 当应用程序执行结束的时候，需要到批处理操作系统中加载运行下一个应用（实际上也是通过系统调用 ``sys_exit`` 来实现的）。
+We know that the batch operating system is designed to run at the kernel-mode privilege level (RISC-V's S mode), which is guaranteed by RustSBI as SEE (Supervisor Execution Environment). The application program is designed to run at the user mode privilege level (RISC-V U mode), and is supervised by the execution environment with the operating system as the core. In this chapter, the execution environment of this application is the AEE (Application Execution Environment) provided by the "Dunkleosteus" batch operating system. In order to establish the execution environment of the application program, the batch operating system needs to perform some initialization work before executing the application program, and monitor the execution of the application program, which is specifically reflected in:
 
-这些处理都涉及到特权级切换，因此需要应用程序、操作系统和硬件一起协同，完成特权级切换机制。
+- When starting an application, it is necessary to initialize the user mode context of the application and switch to the user mode to execute the application;
+- After the application initiates a system call (i.e. issues a Trap), it needs to be processed in the batch operating system;
+- When an error occurs in the execution of an application, it is necessary to go to the batch operating system to kill the application and load and run the next application;
+- When the execution of the application program ends, it needs to load and run the next application in the batch operating system (in fact, it is also implemented through the system call ``sys_exit``).
+
+These processes all involve privilege-level switching, so applications, operating systems, and hardware need to work together to complete the privilege-level switching mechanism.
+
+.. 我们知道，批处理操作系统被设计为运行在内核态特权级（RISC-V 的 S 模式），这是作为 SEE（Supervisor Execution Environment）的 RustSBI 所保证的。而应用程序被设计为运行在用户态特权级（RISC-V 的 U 模式），被操作系统为核心的执行环境监管起来。在本章中，这个应用程序的执行环境即是由“邓式鱼” 批处理操作系统提供的 AEE（Application Execution Environment) 。批处理操作系统为了建立好应用程序的执行环境，需要在执行应用程序之前进行一些初始化工作，并监控应用程序的执行，具体体现在：
+
+.. - 当启动应用程序的时候，需要初始化应用程序的用户态上下文，并能切换到用户态执行应用程序； 
+.. - 当应用程序发起系统调用（即发出 Trap）之后，需要到批处理操作系统中进行处理；
+.. - 当应用程序执行出错的时候，需要到批处理操作系统中杀死该应用并加载运行下一个应用； 
+.. - 当应用程序执行结束的时候，需要到批处理操作系统中加载运行下一个应用（实际上也是通过系统调用 ``sys_exit`` 来实现的）。
+
+.. 这些处理都涉及到特权级切换，因此需要应用程序、操作系统和硬件一起协同，完成特权级切换机制。
 
 
 特权级切换相关的控制状态寄存器
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-当从一般意义上讨论 RISC-V 架构的 Trap 机制时，通常需要注意两点：
+Control Status Registers Related to Privilege Level Switching
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- 在触发 Trap 之前 CPU 运行在哪个特权级；
-- CPU 需要切换到哪个特权级来处理该 Trap ，并在处理完成之后返回原特权级。
+When discussing the trap mechanism of the RISC-V architecture in a general sense, there are usually two points to note:
+
+- Which privilege level the CPU is running at before triggering the Trap;
+- Which privilege level the CPU needs to switch to to process the Trap, and return to the original privilege level after the processing is completed.
   
-但本章中我们仅考虑如下流程：当 CPU 在用户态特权级（ RISC-V 的 U 模式）运行应用程序，执行到 Trap，切换到内核态特权级（ RISC-V的S 模式），批处理操作系统的对应代码响应 Trap，并执行系统调用服务，处理完毕后，从内核态返回到用户态应用程序继续执行后续指令。
+But in this chapter we only consider the following process: when the CPU runs the application program at the user-mode privilege level (RISC-V’s U mode), executes to Trap, switches to the kernel mode privilege level (RISC-V’s S mode), run the corresponding system code responding to the Trap and executes the system call service. After the processing is completed, the application program returns from the kernel mode to the user mode and continues to execute subsequent instructions.
+
+.. 当从一般意义上讨论 RISC-V 架构的 Trap 机制时，通常需要注意两点：
+
+.. - 在触发 Trap 之前 CPU 运行在哪个特权级；
+.. - CPU 需要切换到哪个特权级来处理该 Trap ，并在处理完成之后返回原特权级。
+  
+.. 但本章中我们仅考虑如下流程：当 CPU 在用户态特权级（ RISC-V 的 U 模式）运行应用程序，执行到 Trap，切换到内核态特权级（ RISC-V的S 模式），批处理操作系统的对应代码响应 Trap，并执行系统调用服务，处理完毕后，从内核态返回到用户态应用程序继续执行后续指令。
 
 .. _term-s-mod-csr:
 
-在 RISC-V 架构中，关于 Trap 有一条重要的规则：在 Trap 前的特权级不会高于 Trap 后的特权级。因此如果触发 Trap 之后切换到 S 特权级（下称 Trap 到 S），说明 Trap 发生之前 CPU 只能运行在 S/U 特权级。但无论如何，只要是 Trap 到 S 特权级，操作系统就会使用 S 特权级中与 Trap 相关的 **控制状态寄存器** (CSR, Control and Status Register) 来辅助 Trap 处理。我们在编写运行在 S 特权级的批处理操作系统中的 Trap 处理相关代码的时候，就需要使用如下所示的 S 模式的 CSR 寄存器。
+In the RISC-V architecture, there is an important rule about Trap: the privilege level before Trap must not be higher than the privilege level after trap. Therefore, if you switch to the S privilege level after the Trap is triggered (hereinafter referred to as Trap to S), it means that the CPU can only run at the S/U privilege level before the trap occurs. But in any case, as long as it is a trap to S privilege level, the operating system will use the **Control and Status Register** (CSR) related to trap in the S privilege level to assist in trap processing. When we write the trap processing-related code running in the S privileged batch operating system, we need to use the S mode CSR register as shown below.
 
-.. list-table:: 进入 S 特权级 Trap 的相关 CSR
-   :header-rows: 1
-   :align: center
-   :widths: 30 100
+.. 在 RISC-V 架构中，关于 Trap 有一条重要的规则：在 Trap 前的特权级不会高于 Trap 后的特权级。因此如果触发 Trap 之后切换到 S 特权级（下称 Trap 到 S），说明 Trap 发生之前 CPU 只能运行在 S/U 特权级。但无论如何，只要是 Trap 到 S 特权级，操作系统就会使用 S 特权级中与 Trap 相关的 **控制状态寄存器** (CSR, Control and Status Register) 来辅助 Trap 处理。我们在编写运行在 S 特权级的批处理操作系统中的 Trap 处理相关代码的时候，就需要使用如下所示的 S 模式的 CSR 寄存器。
 
-   * - CSR 名
-     - 该 CSR 与 Trap 相关的功能
-   * - sstatus
-     - ``SPP`` 等字段给出 Trap 发生之前 CPU 处在哪个特权级（S/U）等信息
-   * - sepc
-     - 当 Trap 是一个异常的时候，记录 Trap 发生之前执行的最后一条指令的地址
-   * - scause
-     - 描述 Trap 的原因
-   * - stval
-     - 给出 Trap 附加信息
-   * - stvec
-     - 控制 Trap 处理代码的入口地址
+.. list-table:: Relevant CSR when entering the S privilege Level Trap
+    :header-rows: 1
+    :align: center
+    :widths: 30 100
+
+    * - CSR name
+      - The function of this CSR related to Trap
+    * - sstatus
+      - Fields such as ``SPP`` give information such as which privilege level (S/U) the CPU is in before the Trap occurs
+    * - sepc
+      - When the trap is an exception, record the address of the last instruction executed before the trap occurred
+    * - cause
+      - Describe the reason for the trap
+    * - stval
+      - Give trap additional information
+    * - stvec
+      - Control the entry address of the trap processing code
+
+
+.. .. list-table:: 进入 S 特权级 Trap 的相关 CSR
+..    :header-rows: 1
+..    :align: center
+..    :widths: 30 100
+
+..    * - CSR 名
+..      - 该 CSR 与 Trap 相关的功能
+..    * - sstatus
+..      - ``SPP`` 等字段给出 Trap 发生之前 CPU 处在哪个特权级（S/U）等信息
+..    * - sepc
+..      - 当 Trap 是一个异常的时候，记录 Trap 发生之前执行的最后一条指令的地址
+..    * - scause
+..      - 描述 Trap 的原因
+..    * - stval
+..      - 给出 Trap 附加信息
+..    * - stvec
+..      - 控制 Trap 处理代码的入口地址
 
 .. note::
 
-   **S模式下最重要的 sstatus 寄存器**
+    **The Most Important sstatus Register in S mode**
 
-   注意 ``sstatus`` 是 S 特权级最重要的 CSR，可以从多个方面控制 S 特权级的 CPU 行为和执行状态。
+    Note ``sstatus`` is the most important CSR of the S privilege level, which can control the CPU behavior and execution status of the S privilege level from multiple aspects.
+
+..    **S模式下最重要的 sstatus 寄存器**
+
+..    注意 ``sstatus`` 是 S 特权级最重要的 CSR，可以从多个方面控制 S 特权级的 CPU 行为和执行状态。
    
 .. chy   
    我们在这里先给出它在 Trap 处理过程中的作用。
 
-特权级切换
+.. 特权级切换
+
+Privilege Level Switching
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-当执行一条 Trap 类指令（如 ``ecall`` 时），CPU 发现触发了一个异常并需要进行特殊处理，这涉及到 :ref:`执行环境切换 <term-ee-switch>` 。具体而言，用户态执行环境中的应用程序通过 ``ecall`` 指令向内核态执行环境中的操作系统请求某项服务功能，那么处理器和操作系统会完成到内核态执行环境的切换，并在操作系统完成服务后，再次切换回用户态执行环境，然后应用程序会紧接着 ``ecall`` 指令的后一条指令位置处继续执行，参考 :ref:`图示 <environment-call-flow>` 。
+When executing a Trap-type instruction (such as ``ecall``), the CPU finds that an exception has been triggered and requires special handling, which involves :ref:`Execution context switch <term-ee-switch>`. Specifically, the application program in the user mode execution environment requests a certain service function from the operating system in the kernel mode execution environment through the ``ecall`` instruction. Then the processor and the operating system willswitch to the kernel mode execution environment. And after the operating system completes the service, switch back to the user mode execution environment again. And then the application program will continue to execute immediately after the ``ecall`` instruction. Refer to :ref:`Diagram <environment-call-flow>`.
+
+.. 当执行一条 Trap 类指令（如 ``ecall`` 时），CPU 发现触发了一个异常并需要进行特殊处理，这涉及到 :ref:`执行环境切换 <term-ee-switch>` 。具体而言，用户态执行环境中的应用程序通过 ``ecall`` 指令向内核态执行环境中的操作系统请求某项服务功能，那么处理器和操作系统会完成到内核态执行环境的切换，并在操作系统完成服务后，再次切换回用户态执行环境，然后应用程序会紧接着 ``ecall`` 指令的后一条指令位置处继续执行，参考 :ref:`图示 <environment-call-flow>` 。
 
 .. chy ？？？: 这条触发 Trap 的指令和进入 Trap 之前执行的最后一条指令不一定是同一条。
 
@@ -105,54 +163,92 @@ RISC-V特权级切换
         由调用规范它知道 Trap 之后 ``a0~a1`` 两个寄存器会被用来保存返回值，所以会发生变化。这个信息是应用程序明确知晓的，但某种程度上
         确实也体现了执行流的变化。
 
-应用程序被切换回来之后需要从发出系统调用请求的执行位置恢复应用程序上下文并继续执行，这需要在切换前后维持应用程序的上下文保持不变。应用程序的上下文包括通用寄存器和栈两个主要部分。由于 CPU 在不同特权级下共享一套通用寄存器，所以在运行操作系统的 Trap 处理过程中，操作系统也会用到这些寄存器，这会改变应用程序的上下文。因此，与函数调用需要保存函数调用上下文/活动记录一样，在执行操作系统的 Trap 处理过程（会修改通用寄存器）之前，我们需要在某个地方（某内存块或内核的栈）保存这些寄存器并在 Trap 处理结束后恢复这些寄存器。
+After the application is switched back, it needs to restore the application context from the execution location where the system call request was issued and continue to execute. It requires maintaining the application context before and after the switch. The context of the application program includes two main parts, the general-purpose register and the stack. Since the CPU shares a set of general-purpose registers under different privilege levels, the operating system will also use these registers during the trap processing. This will change the context of the application. Therefore, just like function calls need to save the function call context / activity record, before executing the operating system's trap processing (which will modify the general-purpose registers), we need to save these registers somewhere (a memory block or the kernel's stack) and save them. These registers are restored after the trap processing ends.
 
-除了通用寄存器之外还有一些可能在处理 Trap 过程中会被修改的 CSR，比如 CPU 所在的特权级。我们要保证它们的变化在我们的预期之内。比如，对于特权级转换而言，应该是 Trap 之前在 U 特权级，处理 Trap 的时候在 S 特权级，返回之后又需要回到 U 特权级。而对于栈问题则相对简单，只要两个应用程序执行过程中用来记录执行历史的栈所对应的内存区域不相交，就不会产生令我们头痛的覆盖问题或数据破坏问题，也就无需进行保存/恢复。
+.. 应用程序被切换回来之后需要从发出系统调用请求的执行位置恢复应用程序上下文并继续执行，这需要在切换前后维持应用程序的上下文保持不变。应用程序的上下文包括通用寄存器和栈两个主要部分。由于 CPU 在不同特权级下共享一套通用寄存器，所以在运行操作系统的 Trap 处理过程中，操作系统也会用到这些寄存器，这会改变应用程序的上下文。因此，与函数调用需要保存函数调用上下文/活动记录一样，在执行操作系统的 Trap 处理过程（会修改通用寄存器）之前，我们需要在某个地方（某内存块或内核的栈）保存这些寄存器并在 Trap 处理结束后恢复这些寄存器。
 
-特权级切换的具体过程一部分由硬件直接完成，另一部分则需要由操作系统来实现。
+In addition to general-purpose registers, there are some CSRs that may be modified during trap processing, such as the privilege level of the CPU. We want to ensure that their changes are within our expectations. For example, for the privilege level switching, it should be at the U privilege level before the Trap, and at the S privilege level when processing the trap, and then return to the U privilege level after returning. As for the stack problem, it is relatively simple. As long as the memory areas corresponding to the stacks used to record the execution history during the execution of the two applications do not intersect, there will be no overwriting or data corruption problems that may bother us, and there is no need to perform save/restore.
+
+.. 除了通用寄存器之外还有一些可能在处理 Trap 过程中会被修改的 CSR，比如 CPU 所在的特权级。我们要保证它们的变化在我们的预期之内。比如，对于特权级转换而言，应该是 Trap 之前在 U 特权级，处理 Trap 的时候在 S 特权级，返回之后又需要回到 U 特权级。而对于栈问题则相对简单，只要两个应用程序执行过程中用来记录执行历史的栈所对应的内存区域不相交，就不会产生令我们头痛的覆盖问题或数据破坏问题，也就无需进行保存/恢复。
+
+Part of the privilege level switching is directly completed by the hardware, and the other part needs to be implemented by the operating system.
+
+.. 特权级切换的具体过程一部分由硬件直接完成，另一部分则需要由操作系统来实现。
 
 .. _trap-hw-mechanism:
 
-特权级切换的硬件控制机制
--------------------------------------
+.. 特权级切换的硬件控制机制
 
-当 CPU 执行完一条指令（如 ``ecall`` ）并准备从用户特权级 陷入（ ``Trap`` ）到 S 特权级的时候，硬件会自动完成如下这些事情：
+Hardware Control Mechanism for Privilege Level Switching
+--------------------------------------------------------------------------
 
-- ``sstatus`` 的 ``SPP`` 字段会被修改为 CPU 当前的特权级（U/S）。
-- ``sepc`` 会被修改为 Trap 处理完成后默认会执行的下一条指令的地址。
-- ``scause/stval`` 分别会被修改成这次 Trap 的原因以及相关的附加信息。
-- CPU 会跳转到 ``stvec`` 所设置的 Trap 处理入口地址，并将当前特权级设置为 S ，然后从Trap 处理入口地址处开始执行。
+When the CPU finishes executing an instruction (such as ``ecall``) and prepares to trap (``Trap``) from the user privilege level to the S privilege level, the hardware will automatically complete the following steps:
+
+- The ``SPP`` field of ``sstatus`` will be modified to the current privilege level (U/S) of the CPU.
+- ``sepc`` will be modified to the address of the next instruction that will be executed by default after the trap processing is completed.
+- ``scause/stval`` will be modified to the reason of this trap and related additional information respectively.
+- The CPU will jump to the trap processing entry address set by ``stvec``, set the current privilege level to S, and then start executing from the trap processing entry address.
+
+.. 当 CPU 执行完一条指令（如 ``ecall`` ）并准备从用户特权级 陷入（ ``Trap`` ）到 S 特权级的时候，硬件会自动完成如下这些事情：
+
+.. - ``sstatus`` 的 ``SPP`` 字段会被修改为 CPU 当前的特权级（U/S）。
+.. - ``sepc`` 会被修改为 Trap 处理完成后默认会执行的下一条指令的地址。
+.. - ``scause/stval`` 分别会被修改成这次 Trap 的原因以及相关的附加信息。
+.. - CPU 会跳转到 ``stvec`` 所设置的 Trap 处理入口地址，并将当前特权级设置为 S ，然后从Trap 处理入口地址处开始执行。
 
 .. note::
 
-   **stvec 相关细节**
+    **stvec related details**
 
-   在 RV64 中， ``stvec`` 是一个 64 位的 CSR，在中断使能的情况下，保存了中断处理的入口地址。它有两个字段：
+    In RV64, ``stvec`` is a 64-bit CSR, which stores the entry address of the interrupt processing when the interrupt is enabled. It has two fields:
 
-   - MODE 位于 [1:0]，长度为 2 bits；
-   - BASE 位于 [63:2]，长度为 62 bits。
+    - MODE is at [1:0], the length is 2 bits;
+    - BASE is located at [63:2] and has a length of 62 bits.
 
-   当 MODE 字段为 0 的时候， ``stvec`` 被设置为 Direct 模式，此时进入 S 模式的 Trap 无论原因如何，处理 Trap 的入口地址都是 ``BASE<<2`` ， CPU 会跳转到这个地方进行异常处理。本书中我们只会将 ``stvec`` 设置为 Direct 模式。而 ``stvec`` 还可以被设置为 Vectored 模式，有兴趣的同学可以自行参考 RISC-V 指令集特权级规范。
+    When the MODE field is 0, ``stvec`` is set to Direct mode. At this time, no matter what the reason is for the trap entering S mode, the entry address for processing the trap is ``BASE<<2``, and the CPU will jump to this place for exception handling. In this book we will only set ``stvec`` to Direct mode. And ``stvec`` can also be set to Vectored mode. Interested students can refer to the RISC-V instruction set privilege level specification by themselves.
 
-而当 CPU 完成 Trap 处理准备返回的时候，需要通过一条 S 特权级的特权指令 ``sret`` 来完成，这一条指令具体完成以下功能：
+..    **stvec 相关细节**
 
-- CPU 会将当前的特权级按照 ``sstatus`` 的 ``SPP`` 字段设置为 U 或者 S ；
-- CPU 会跳转到 ``sepc`` 寄存器指向的那条指令，然后继续执行。
+..    在 RV64 中， ``stvec`` 是一个 64 位的 CSR，在中断使能的情况下，保存了中断处理的入口地址。它有两个字段：
 
-这些基本上都是硬件不得不完成的事情，还有一些剩下的收尾工作可以都交给软件，让操作系统能有更大的灵活性。
+..    - MODE 位于 [1:0]，长度为 2 bits；
+..    - BASE 位于 [63:2]，长度为 62 bits。
 
-用户栈与内核栈
+..    当 MODE 字段为 0 的时候， ``stvec`` 被设置为 Direct 模式，此时进入 S 模式的 Trap 无论原因如何，处理 Trap 的入口地址都是 ``BASE<<2`` ， CPU 会跳转到这个地方进行异常处理。本书中我们只会将 ``stvec`` 设置为 Direct 模式。而 ``stvec`` 还可以被设置为 Vectored 模式，有兴趣的同学可以自行参考 RISC-V 指令集特权级规范。
+
+When the CPU completes the Trap processing and prepares to return, it needs to complete it through an S-privileged privileged instruction ``sret``. This instruction specifically performs the following step:
+
+- The CPU will set the current privilege level to U or S according to the ``SPP`` field of ``sstatus``;
+- The CPU will jump to the instruction pointed to by the ``sepc`` register and continue execution.
+
+These are basically what the hardware has to do. And some remaining finishing work can be handed over to the software, so that the operating system can have greater flexibility.
+
+.. 而当 CPU 完成 Trap 处理准备返回的时候，需要通过一条 S 特权级的特权指令 ``sret`` 来完成，这一条指令具体完成以下功能：
+
+.. - CPU 会将当前的特权级按照 ``sstatus`` 的 ``SPP`` 字段设置为 U 或者 S ；
+.. - CPU 会跳转到 ``sepc`` 寄存器指向的那条指令，然后继续执行。
+
+.. 这些基本上都是硬件不得不完成的事情，还有一些剩下的收尾工作可以都交给软件，让操作系统能有更大的灵活性。
+
+.. 用户栈与内核栈
+
+User Stack and Kernel Stack
 --------------------------------
 
-在 Trap 触发的一瞬间， CPU 就会切换到 S 特权级并跳转到 ``stvec`` 所指示的位置。但是在正式进入 S 特权级的 Trap 处理之前，上面
-提到过我们必须保存原控制流的寄存器状态，这一般通过内核栈来保存。注意，我们需要用专门为操作系统准备的内核栈，而不是应用程序运行时用到的用户栈。
+The moment the Trap is triggered, the CPU will switch to the S privilege level and jump to the location indicated by ``stvec``. But before officially entering the trap processing at the S privilege level, it was mentioned above that we must save the register state of the original control flow, which is generally saved through the kernel stack. Note that we need to use the kernel stack specially prepared for the operating system, not the user stack used by the application when it is running.
+
+.. 在 Trap 触发的一瞬间， CPU 就会切换到 S 特权级并跳转到 ``stvec`` 所指示的位置。但是在正式进入 S 特权级的 Trap 处理之前，上面提到过我们必须保存原控制流的寄存器状态，这一般通过内核栈来保存。注意，我们需要用专门为操作系统准备的内核栈，而不是应用程序运行时用到的用户栈。
 
 .. 
     chy:我们在一个作为用户栈的特别留出的内存区域上保存应用程序的栈信息，而 Trap 执行流则使用另一个内核栈。
 
-使用两个不同的栈主要是为了安全性：如果两个控制流（即应用程序的控制流和内核的控制流）使用同一个栈，在返回之后应用程序就能读到 Trap 控制流的历史信息，比如内核一些函数的地址，这样会带来安全隐患。于是，我们要做的是，在批处理操作系统中添加一段汇编代码，实现从用户栈切换到内核栈，并在内核栈上保存应用程序控制流的寄存器状态。
+Using two different stacks is mainly for security: if two control flows (that is, the control flow of the application and the control flow of the kernel) use the same stack, the application can read the history information of the trap control flow after returning, such as the address of some kernel functions. This will bring security risks. So, what we have to do is to add a piece of assembly code in the batch operating system to switch from the user stack to the kernel stack, and save the register state of the application control flow on the kernel stack.
 
-我们声明两个类型 ``KernelStack`` 和 ``UserStack`` 分别表示用户栈和内核栈，它们都只是字节数组的简单包装：
+.. 使用两个不同的栈主要是为了安全性：如果两个控制流（即应用程序的控制流和内核的控制流）使用同一个栈，在返回之后应用程序就能读到 Trap 控制流的历史信息，比如内核一些函数的地址，这样会带来安全隐患。于是，我们要做的是，在批处理操作系统中添加一段汇编代码，实现从用户栈切换到内核栈，并在内核栈上保存应用程序控制流的寄存器状态。
+
+We declare two types ``KernelStack`` and ``UserStack`` to represent the user stack and the kernel stack respectively, both of which are simply wrappers around byte arrays:
+
+.. 我们声明两个类型 ``KernelStack`` 和 ``UserStack`` 分别表示用户栈和内核栈，它们都只是字节数组的简单包装：
 
 .. code-block:: rust
     :linenos:
@@ -175,9 +271,13 @@ RISC-V特权级切换
     static KERNEL_STACK: KernelStack = KernelStack { data: [0; KERNEL_STACK_SIZE] };
     static USER_STACK: UserStack = UserStack { data: [0; USER_STACK_SIZE] };
 
-常数 ``USER_STACK_SIZE`` 和 ``KERNEL_STACK_SIZE`` 指出内核栈和用户栈的大小分别为 :math:`8\text{KiB}` 。两个类型是以全局变量的形式实例化在批处理操作系统的 ``.bss`` 段中的。
+The constants ``USER_STACK_SIZE`` and ``KERNEL_STACK_SIZE`` specify the size of the kernel stack and user stack to be :math:`8\text{KiB}` respectively. Both types are instantiated as global variables in the ``.bss`` section of the batch operating system.
 
-我们为两个类型实现了 ``get_sp`` 方法来获取栈顶地址。由于在 RISC-V 中栈是向下增长的，我们只需返回包裹的数组的结尾地址，以用户栈类型 ``UserStack`` 为例：
+We implemented the ``get_sp`` method for both types to get the address of the top of the stack. Since the stack grows downward in RISC-V, we only need to return the end address of the wrapped array, taking the user stack type ``UserStack`` as an example:
+
+.. 常数 ``USER_STACK_SIZE`` 和 ``KERNEL_STACK_SIZE`` 指出内核栈和用户栈的大小分别为 :math:`8\text{KiB}` 。两个类型是以全局变量的形式实例化在批处理操作系统的 ``.bss`` 段中的。
+
+.. 我们为两个类型实现了 ``get_sp`` 方法来获取栈顶地址。由于在 RISC-V 中栈是向下增长的，我们只需返回包裹的数组的结尾地址，以用户栈类型 ``UserStack`` 为例：
 
 .. code-block:: rust
     :linenos:
@@ -188,11 +288,15 @@ RISC-V特权级切换
         }
     }
 
-于是换栈是非常简单的，只需将 ``sp`` 寄存器的值修改为 ``get_sp`` 的返回值即可。
+So switching the stack is very simple-- just change the value of the ``sp`` register to the return value of ``get_sp``.
+
+.. 于是换栈是非常简单的，只需将 ``sp`` 寄存器的值修改为 ``get_sp`` 的返回值即可。
 
 .. _term-trap-context:
 
-接下来是Trap上下文（即数据结构 ``TrapContext`` ），类似前面提到的函数调用上下文，即在 Trap 发生时需要保存的物理资源内容，并将其一起放在一个名为 ``TrapContext`` 的类型中，定义如下：
+Next is the Trap context (that is, the data structure ``TrapContext``), similar to the function call context mentioned above, that is, the physical resource state that needs to be saved when the Trap occurs. We put them together in a named ``TrapContext`` is defined as follows:
+
+.. 接下来是Trap上下文（即数据结构 ``TrapContext`` ），类似前面提到的函数调用上下文，即在 Trap 发生时需要保存的物理资源内容，并将其一起放在一个名为 ``TrapContext`` 的类型中，定义如下：
 
 .. code-block:: rust
     :linenos:
@@ -206,32 +310,53 @@ RISC-V特权级切换
         pub sepc: usize,
     }
 
-可以看到里面包含所有的通用寄存器 ``x0~x31`` ，还有 ``sstatus`` 和 ``sepc`` 。那么为什么需要保存它们呢？
+You can see that it contains all general-purpose registers ``x0~x31``, as well as ``sstatus`` and ``sepc``. So why do you need to save them?
 
-- 对于通用寄存器而言，两条控制流（应用程序控制流和内核控制流）运行在不同的特权级，所属的软件也可能由不同的编程语言编写，虽然在 Trap 控制流中只是会执行 Trap 处理相关的代码，但依然可能直接或间接调用很多模块，因此很难甚至不可能找出哪些寄存器无需保存。既然如此我们就只能全部保存了。但这里也有一些例外，如 ``x0`` 被硬编码为 0 ，它自然不会有变化；还有 ``tp(x4)`` 寄存器，除非我们手动出于一些特殊用途使用它，否则一般也不会被用到。虽然它们无需保存，但我们仍然在 ``TrapContext`` 中为它们预留空间，主要是为了后续的实现方便。
-- 对于 CSR 而言，我们知道进入 Trap 的时候，硬件会立即覆盖掉 ``scause/stval/sstatus/sepc`` 的全部或是其中一部分。``scause/stval`` 的情况是：它总是在 Trap 处理的第一时间就被使用或者是在其他地方保存下来了，因此它没有被修改并造成不良影响的风险。而对于 ``sstatus/sepc`` 而言，它们会在 Trap 处理的全程有意义（在 Trap 控制流最后 ``sret`` 的时候还用到了它们），而且确实会出现 Trap 嵌套的情况使得它们的值被覆盖掉。所以我们需要将它们也一起保存下来，并在 ``sret`` 之前恢复原样。
+- For general-purpose registers, the two control flows (application control flow and kernel control flow) run at different privilege levels, and the software they belong to may also be written in different programming languages. Although only Trap will be executed in the Trap control flow, there are still many modules that may be called directly or indirectly. So it is difficult or impossible to find out which registers do not need to be saved. In this case, we can only save them all. But there are some exceptions here, such as ``x0`` is hard-coded to 0, it will not change naturally; there is also the ``tp(x4)`` register, unless we manually use it for some special purposes, it is generally will not be used either. Although they don't need to be saved, we still reserve space for them in ``TrapContext``, mainly for the convenience of subsequent implementations.
+- For CSR, we know that when entering the Trap, the hardware will immediately overwrite all or part of ``scause/stval/sstatus/sepc``. The case of ``scause/stval`` is: it is always used as soon as the Trap is processed or saved elsewhere, so there is no risk of it being modified and having bad effects. For ``sstatus/sepc``, they will be meaningful throughout the trap processing (they are also used when ``sret`` is at the end of the trap control flow). And it is possible that trap nesting have their values are overwritten. So we need to save them as well and restore them before ``sret``
+
+.. 可以看到里面包含所有的通用寄存器 ``x0~x31`` ，还有 ``sstatus`` 和 ``sepc`` 。那么为什么需要保存它们呢？
+
+.. - 对于通用寄存器而言，两条控制流（应用程序控制流和内核控制流）运行在不同的特权级，所属的软件也可能由不同的编程语言编写，虽然在 Trap 控制流中只是会执行 Trap 处理相关的代码，但依然可能直接或间接调用很多模块，因此很难甚至不可能找出哪些寄存器无需保存。既然如此我们就只能全部保存了。但这里也有一些例外，如 ``x0`` 被硬编码为 0 ，它自然不会有变化；还有 ``tp(x4)`` 寄存器，除非我们手动出于一些特殊用途使用它，否则一般也不会被用到。虽然它们无需保存，但我们仍然在 ``TrapContext`` 中为它们预留空间，主要是为了后续的实现方便。
+.. - 对于 CSR 而言，我们知道进入 Trap 的时候，硬件会立即覆盖掉 ``scause/stval/sstatus/sepc`` 的全部或是其中一部分。``scause/stval`` 的情况是：它总是在 Trap 处理的第一时间就被使用或者是在其他地方保存下来了，因此它没有被修改并造成不良影响的风险。而对于 ``sstatus/sepc`` 而言，它们会在 Trap 处理的全程有意义（在 Trap 控制流最后 ``sret`` 的时候还用到了它们），而且确实会出现 Trap 嵌套的情况使得它们的值被覆盖掉。所以我们需要将它们也一起保存下来，并在 ``sret`` 之前恢复原样。
 
 
-Trap 管理
+.. Trap 管理
+
+Trap Management
 -------------------------------
 
-特权级切换的核心是对Trap的管理。这主要涉及到如下一些内容：
+The core of privilege level switching is the management of traps. This mainly involves the following:
 
-- 应用程序通过 ``ecall`` 进入到内核状态时，操作系统保存被打断的应用程序的 Trap 上下文；
-- 操作系统根据Trap相关的CSR寄存器内容，完成系统调用服务的分发与处理；
-- 操作系统完成系统调用服务后，需要恢复被打断的应用程序的Trap 上下文，并通 ``sret`` 让应用程序继续执行。
+- When the application enters the kernel state through ``ecall``, the operating system saves the Trap context of the interrupted application;
+- The operating system completes the invocation and processing of the system call service according to the contents of the Trap-related CSR register;
+- After the operating system completes the system call service, it needs to restore the trap context of the interrupted application, and let the application continue to execute through ``sret``.
 
-接下来我们具体介绍上述内容。
+Next, we introduce the above in detail.
 
-Trap 上下文的保存与恢复
+.. 特权级切换的核心是对Trap的管理。这主要涉及到如下一些内容：
+
+.. - 应用程序通过 ``ecall`` 进入到内核状态时，操作系统保存被打断的应用程序的 Trap 上下文；
+.. - 操作系统根据Trap相关的CSR寄存器内容，完成系统调用服务的分发与处理；
+.. - 操作系统完成系统调用服务后，需要恢复被打断的应用程序的Trap 上下文，并通 ``sret`` 让应用程序继续执行。
+
+.. 接下来我们具体介绍上述内容。
+
+.. Trap 上下文的保存与恢复
+
+Saving and Restoring Trap Context
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-首先是具体实现 Trap 上下文保存和恢复的汇编代码。
+The first is the assembly code that implements the save and restoration of the Trap context.
+
+.. 首先是具体实现 Trap 上下文保存和恢复的汇编代码。
 
 .. _trap-context-save-restore: 
 
 
-在批处理操作系统初始化的时候，我们需要修改 ``stvec`` 寄存器来指向正确的 Trap 处理入口点。
+When the batch operating system is initialized, we need to modify the ``stvec`` register to point to the correct trap processing entry point.
+
+.. 在批处理操作系统初始化的时候，我们需要修改 ``stvec`` 寄存器来指向正确的 Trap 处理入口点。
 
 .. code-block:: rust
     :linenos:
@@ -247,11 +372,17 @@ Trap 上下文的保存与恢复
         }
     }
 
-这里我们引入了一个外部符号 ``__alltraps`` ，并将 ``stvec`` 设置为 Direct 模式指向它的地址。我们在 ``os/src/trap/trap.S`` 中实现 Trap 上下文保存/恢复的汇编代码，分别用外部符号 ``__alltraps`` 和 ``__restore`` 标记为函数，并通过 ``global_asm!`` 宏将 ``trap.S`` 这段汇编代码插入进来。
+Here we introduce an external symbol ``__alltraps`` and set ``stvec`` to point to its address in Direct mode. We implement the assembly code of Trap context save/restore in ``os/src/trap/trap.S``, marked as functions with external symbols ``__alltraps`` and ``__restore`` respectively. And we pass ``global_asm The !`` macro to insert the assembly code ``trap.S``.
 
-Trap 处理的总体流程如下：首先通过 ``__alltraps`` 将 Trap 上下文保存在内核栈上，然后跳转到使用 Rust 编写的 ``trap_handler`` 函数完成 Trap 分发及处理。当 ``trap_handler`` 返回之后，使用 ``__restore`` 从保存在内核栈上的 Trap 上下文恢复寄存器。最后通过一条 ``sret`` 指令回到应用程序执行。
+The overall process of trap processing is as follows: first save the trap context on the kernel stack through ``__alltraps``, and then jump to the ``trap_handler`` function written in Rust to complete trap invocation and processing. After ``trap_handler`` returns, use ``__restore`` to restore the registers from the trap context saved on the kernel stack. Finally, return to the application program execution through a ``sret`` instruction.
 
-首先是保存 Trap 上下文的 ``__alltraps`` 的实现：
+The first is the implementation of ``__alltraps`` that holds the Trap context:
+
+.. 这里我们引入了一个外部符号 ``__alltraps`` ，并将 ``stvec`` 设置为 Direct 模式指向它的地址。我们在 ``os/src/trap/trap.S`` 中实现 Trap 上下文保存/恢复的汇编代码，分别用外部符号 ``__alltraps`` 和 ``__restore`` 标记为函数，并通过 ``global_asm!`` 宏将 ``trap.S`` 这段汇编代码插入进来。
+
+.. Trap 处理的总体流程如下：首先通过 ``__alltraps`` 将 Trap 上下文保存在内核栈上，然后跳转到使用 Rust 编写的 ``trap_handler`` 函数完成 Trap 分发及处理。当 ``trap_handler`` 返回之后，使用 ``__restore`` 从保存在内核栈上的 Trap 上下文恢复寄存器。最后通过一条 ``sret`` 指令回到应用程序执行。
+
+.. 首先是保存 Trap 上下文的 ``__alltraps`` 的实现：
 
 .. code-block:: riscv
     :linenos:
