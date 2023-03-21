@@ -78,7 +78,7 @@ In the RISC-V architecture, there is an important rule about Trap: the privilege
     :widths: 30 100
 
     * - CSR name
-      - The function of this CSR related to Trap
+      - The Trap-relevant function of this CSR
     * - sstatus
       - Fields such as ``SPP`` give information such as which privilege level (S/U) the CPU is in before the Trap occurs
     * - sepc
@@ -329,8 +329,8 @@ Trap Management
 The core of privilege level switching is the management of traps. This mainly involves the following:
 
 - When the application enters the kernel state through ``ecall``, the operating system saves the Trap context of the interrupted application;
-- The operating system completes the invocation and processing of the system call service according to the contents of the Trap-related CSR register;
-- After the operating system completes the system call service, it needs to restore the trap context of the interrupted application, and let the application continue to execute through ``sret``.
+- The operating system completes the dispatching and processing of the system call service according to the contents of the Trap-related CSR register;
+- After the operating system finishes the system call service, it needs to restore the trap context of the interrupted application, and let the application continue to execute through ``sret``.
 
 Next, we introduce the above in detail.
 
@@ -347,7 +347,7 @@ Next, we introduce the above in detail.
 Saving and Restoring Trap Context
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The first is the assembly code that implements the save and restoration of the Trap context.
+The first is the assembly code that implements the saving and restoration of the Trap context.
 
 .. 首先是具体实现 Trap 上下文保存和恢复的汇编代码。
 
@@ -374,7 +374,7 @@ When the batch operating system is initialized, we need to modify the ``stvec`` 
 
 Here we introduce an external symbol ``__alltraps`` and set ``stvec`` to point to its address in Direct mode. We implement the assembly code of Trap context save/restore in ``os/src/trap/trap.S``, marked as functions with external symbols ``__alltraps`` and ``__restore`` respectively. And we pass ``global_asm The !`` macro to insert the assembly code ``trap.S``.
 
-The overall process of trap processing is as follows: first save the trap context on the kernel stack through ``__alltraps``, and then jump to the ``trap_handler`` function written in Rust to complete trap invocation and processing. After ``trap_handler`` returns, use ``__restore`` to restore the registers from the trap context saved on the kernel stack. Finally, return to the application program execution through a ``sret`` instruction.
+The overall process of trap processing is as follows: first save the trap context on the kernel stack through ``__alltraps``, and then jump to the ``trap_handler`` function written in Rust to complete trap dispatching and processing. After ``trap_handler`` returns, use ``__restore`` to restore the registers from the trap context saved on the kernel stack. Finally, return to the application program execution through a ``sret`` instruction.
 
 The first is the implementation of ``__alltraps`` that holds the Trap context:
 
@@ -422,28 +422,46 @@ The first is the implementation of ``__alltraps`` that holds the Trap context:
         mv a0, sp
         call trap_handler
 
-- 第 7 行我们使用 ``.align`` 将 ``__alltraps`` 的地址 4 字节对齐，这是 RISC-V 特权级规范的要求；
-- 第 9 行的 ``csrrw`` 原型是 :math:`\text{csrrw rd, csr, rs}` 可以将 CSR 当前的值读到通用寄存器 :math:`\text{rd}` 中，然后将通用寄存器 :math:`\text{rs}` 的值写入该 CSR 。因此这里起到的是交换 sscratch 和 sp 的效果。在这一行之前 sp 指向用户栈， sscratch 指向内核栈（原因稍后说明），现在 sp 指向内核栈， sscratch 指向用户栈。
-- 第 12 行，我们准备在内核栈上保存 Trap 上下文，于是预先分配 :math:`34\times 8` 字节的栈帧，这里改动的是 sp ，说明确实是在内核栈上。
-- 第 13~24 行，保存 Trap 上下文的通用寄存器 x0~x31，跳过 x0 和 tp(x4)，原因之前已经说明。我们在这里也不保存 sp(x2)，因为我们要基于它来找到每个寄存器应该被保存到的正确的位置。实际上，在栈帧分配之后，我们可用于保存 Trap 上下文的地址区间为 :math:`[\text{sp},\text{sp}+8\times34)` ，按照  ``TrapContext`` 结构体的内存布局，基于内核栈的位置（sp所指地址）来从低地址到高地址分别按顺序放置 x0~x31这些通用寄存器，最后是 sstatus 和 sepc 。因此通用寄存器 xn 应该被保存在地址区间 :math:`[\text{sp}+8n,\text{sp}+8(n+1))` 。
+- On line 7, we use ``.align`` to align the address of ``__alltraps`` to 4 bytes, which is the requirement of the RISC-V privilege level specification;
+- The prototype of ``csrrw`` in line 9 is :math:`\text{csrrw rd, csr, rs}`, which can load the current CSR value into the general register :math:`\text{rd}`, and then write the general register value :math:`\text{rs}` to this CSR. Effectively, it exchanges sscratch and sp. Before this line sp points to the user stack, sscratch points to the kernel stack (which will be explained later). Now sp points to the kernel stack, and sscratch points to the user stack.
+- On line 12, we are going to save the Trap context on the kernel stack, so we pre-allocate a stack frame of :math:`34\times 8` bytes. Here the sp is changed, indicating that it is indeed on the kernel stack.
+- Lines 13~24, save the general-purpose registers x0~x31 of the Trap context. We skip x0 and tp(x4), as explained before. We also don't save sp(x2) here, because we need to hinge on it to find the correct location where each register is saved. In fact, after the stack frame is allocated, the address range we can use to save the Trap context is :math:`[\text{sp},\text{sp}+8\times34)`. According to the ``TrapContext`` structure, the memory layout of the kernel stack is: from the kernel stack top (the address pointed by sp), the general-purpose registers x0~x31 are placed in order from the low address to the high address, and finally sstatus and sepc. Therefore the general register xn should be stored in the address range :math:`[\text{sp}+8n,\text{sp}+8(n+1))`. To simplify the code, the 27 general-purpose registers x5~x31 are saved by using the ``SAVE_GP`` macro each time through a loop-like ``.rept``, and the essence is the same. Note that we need to add ``.altmacro`` at the beginning of ``trap.S`` to enable the ``.rept`` command. 
 
-  为了简化代码，x5~x31 这 27 个通用寄存器我们通过类似循环的 ``.rept`` 每次使用 ``SAVE_GP`` 宏来保存，其实质是相同的。注意我们需要在 ``trap.S`` 开头加上 ``.altmacro`` 才能正常使用 ``.rept`` 命令。
-- 第 25~28 行，我们将 CSR sstatus 和 sepc 的值分别读到寄存器 t0 和 t1 中然后保存到内核栈对应的位置上。指令 :math:`\text{csrr rd, csr}`  的功能就是将 CSR 的值读到寄存器 :math:`\text{rd}` 中。这里我们不用担心 t0 和 t1 被覆盖，因为它们刚刚已经被保存了。
-- 第 30~31 行专门处理 sp 的问题。首先将 sscratch 的值读到寄存器 t2 并保存到内核栈上，注意： sscratch 的值是进入 Trap 之前的 sp 的值，指向用户栈。而现在的 sp 则指向内核栈。
-- 第 33 行令 :math:`\text{a}_0\leftarrow\text{sp}`，让寄存器 a0 指向内核栈的栈指针也就是我们刚刚保存的 Trap 上下文的地址，这是由于我们接下来要调用 ``trap_handler`` 进行 Trap 处理，它的第一个参数 ``cx`` 由调用规范要从 a0 中获取。而 Trap 处理函数 ``trap_handler`` 需要 Trap 上下文的原因在于：它需要知道其中某些寄存器的值，比如在系统调用的时候应用程序传过来的 syscall ID 和对应参数。我们不能直接使用这些寄存器现在的值，因为它们可能已经被修改了，因此要去内核栈上找已经被保存下来的值。
+- Lines 25~28, we read the values of CSR sstatus and sepc into registers t0 and t1 respectively and save them to the corresponding positions of the kernel stack. The function of the instruction :math:`\text{csrr rd, csr}` is to read the value of CSR into the register :math:`\text{rd}`. Here we don't need to worry about t0 and t1 being overwritten, because they have just been saved.
+- Lines 30~31 deal exclusively with sp. First read the value of sscratch into register t2 and save it on the kernel stack. Note: The value of sscratch is the value of sp before entering Trap, pointing to the user stack. And now sp points to the kernel stack.
+- The 33rd line command :math:`\text{a}_0\leftarrow\text{sp}`, let the register a0 point to the stack pointer of the kernel stack, which is the address of the Trap context we just saved. Because we will To call ``trap_handler`` for Trap processing, its first parameter ``cx`` must be obtained from a0 by the calling convention. The reason why the trap handler ``trap_handler`` needs a trap context is that it needs to know the values of some of the registers, such as the syscall ID and corresponding parameters passed by the application when the system call is triggered. We cannot directly use the current values of these registers, because they may have been modified. So we have to find the saved values on the kernel stack.
+
+.. - 第 7 行我们使用 ``.align`` 将 ``__alltraps`` 的地址 4 字节对齐，这是 RISC-V 特权级规范的要求；
+.. - 第 9 行的 ``csrrw`` 原型是 :math:`\text{csrrw rd, csr, rs}` 可以将 CSR 当前的值读到通用寄存器 :math:`\text{rd}` 中，然后将通用寄存器 :math:`\text{rs}` 的值写入该 CSR 。因此这里起到的是交换 sscratch 和 sp 的效果。在这一行之前 sp 指向用户栈， sscratch 指向内核栈（原因稍后说明），现在 sp 指向内核栈， sscratch 指向用户栈。
+.. - 第 12 行，我们准备在内核栈上保存 Trap 上下文，于是预先分配 :math:`34\times 8` 字节的栈帧，这里改动的是 sp ，说明确实是在内核栈上。
+.. - 第 13~24 行，保存 Trap 上下文的通用寄存器 x0~x31，跳过 x0 和 tp(x4)，原因之前已经说明。我们在这里也不保存 sp(x2)，因为我们要基于它来找到每个寄存器应该被保存到的正确的位置。实际上，在栈帧分配之后，我们可用于保存 Trap 上下文的地址区间为 :math:`[\text{sp},\text{sp}+8\times34)` ，按照  ``TrapContext`` 结构体的内存布局，基于内核栈的位置（sp所指地址）来从低地址到高地址分别按顺序放置 x0~x31这些通用寄存器，最后是 sstatus 和 sepc 。因此通用寄存器 xn 应该被保存在地址区间 :math:`[\text{sp}+8n,\text{sp}+8(n+1))` 。
+
+..   为了简化代码，x5~x31 这 27 个通用寄存器我们通过类似循环的 ``.rept`` 每次使用 ``SAVE_GP`` 宏来保存，其实质是相同的。注意我们需要在 ``trap.S`` 开头加上 ``.altmacro`` 才能正常使用 ``.rept`` 命令。
+.. - 第 25~28 行，我们将 CSR sstatus 和 sepc 的值分别读到寄存器 t0 和 t1 中然后保存到内核栈对应的位置上。指令 :math:`\text{csrr rd, csr}`  的功能就是将 CSR 的值读到寄存器 :math:`\text{rd}` 中。这里我们不用担心 t0 和 t1 被覆盖，因为它们刚刚已经被保存了。
+.. - 第 30~31 行专门处理 sp 的问题。首先将 sscratch 的值读到寄存器 t2 并保存到内核栈上，注意： sscratch 的值是进入 Trap 之前的 sp 的值，指向用户栈。而现在的 sp 则指向内核栈。
+.. - 第 33 行令 :math:`\text{a}_0\leftarrow\text{sp}`，让寄存器 a0 指向内核栈的栈指针也就是我们刚刚保存的 Trap 上下文的地址，这是由于我们接下来要调用 ``trap_handler`` 进行 Trap 处理，它的第一个参数 ``cx`` 由调用规范要从 a0 中获取。而 Trap 处理函数 ``trap_handler`` 需要 Trap 上下文的原因在于：它需要知道其中某些寄存器的值，比如在系统调用的时候应用程序传过来的 syscall ID 和对应参数。我们不能直接使用这些寄存器现在的值，因为它们可能已经被修改了，因此要去内核栈上找已经被保存下来的值。
 
 
 .. _term-atomic-instruction:
 
 .. note::
 
-    **CSR 相关原子指令**
 
-    RISC-V 中读写 CSR 的指令是一类能不会被打断地完成多个读写操作的指令。这种不会被打断地完成多个操作的指令被称为 **原子指令** (Atomic Instruction)。这里的 **原子** 的含义是“不可分割的最小个体”，也就是说指令的多个操作要么都不完成，要么全部完成，而不会处于某种中间状态。
+    **CSR related atomic instructions**
 
-    另外，RISC-V 架构中常规的数据处理和访存类指令只能操作通用寄存器而不能操作 CSR 。因此，当想要对 CSR 进行操作时，需要先使用读取 CSR 的指令将 CSR 读到一个通用寄存器中，而后操作该通用寄存器，最后再使用写入 CSR 的指令将该通用寄存器的值写入到 CSR 中。
+     The instruction to read and write CSR in RISC-V is a kind of instruction that can complete multiple read and write operations without interruption. This instruction that completes multiple operations without being interrupted is called **Atomic Instruction**. The meaning of **atom** here is "the smallest indivisible individual", that is to say, the multiple operations of the instruction are either not completed or all completed without being in some intermediate state.
 
-当 ``trap_handler`` 返回之后会从调用 ``trap_handler`` 的下一条指令开始执行，也就是从栈上的 Trap 上下文恢复的 ``__restore`` ：
+     In addition, conventional data processing and memory access instructions in the RISC-V architecture can only operate general-purpose registers and cannot operate CSR. Therefore, when you want to operate the CSR, you need to read the CSR into a general-purpose register with the instruction of reading CSR first, then operate the general-purpose register, and finally write the value of the general-purpose register with the instruction of writing CSR into the CSR.
+
+    .. **CSR 相关原子指令**
+
+    .. RISC-V 中读写 CSR 的指令是一类能不会被打断地完成多个读写操作的指令。这种不会被打断地完成多个操作的指令被称为 **原子指令** (Atomic Instruction)。这里的 **原子** 的含义是“不可分割的最小个体”，也就是说指令的多个操作要么都不完成，要么全部完成，而不会处于某种中间状态。
+
+    .. 另外，RISC-V 架构中常规的数据处理和访存类指令只能操作通用寄存器而不能操作 CSR 。因此，当想要对 CSR 进行操作时，需要先使用读取 CSR 的指令将 CSR 读到一个通用寄存器中，而后操作该通用寄存器，最后再使用写入 CSR 的指令将该通用寄存器的值写入到 CSR 中。
+
+When ``trap_handler`` returns, it will be executed from the next instruction that called ``trap_handler``, that is, ``__restore`` to restore from the Trap context on the stack:
+
+.. 当 ``trap_handler`` 返回之后会从调用 ``trap_handler`` 的下一条指令开始执行，也就是从栈上的 Trap 上下文恢复的 ``__restore`` ：
 
 .. _code-restore:
 
@@ -482,23 +500,38 @@ The first is the implementation of ``__alltraps`` that holds the Trap context:
         csrrw sp, sscratch, sp
         sret
 
-- 第 10 行比较奇怪我们暂且不管，假设它从未发生，那么 sp 仍然指向内核栈的栈顶。
-- 第 13~26 行负责从内核栈顶的 Trap 上下文恢复通用寄存器和 CSR 。注意我们要先恢复 CSR 再恢复通用寄存器，这样我们使用的三个临时寄存器才能被正确恢复。
-- 在第 28 行之前，sp 指向保存了 Trap 上下文之后的内核栈栈顶， sscratch 指向用户栈栈顶。我们在第 28 行在内核栈上回收 Trap 上下文所占用的内存，回归进入 Trap 之前的内核栈栈顶。第 30 行，再次交换 sscratch 和 sp，现在 sp 重新指向用户栈栈顶，sscratch 也依然保存进入 Trap 之前的状态并指向内核栈栈顶。
-- 在应用程序控制流状态被还原之后，第 31 行我们使用 ``sret`` 指令回到 U 特权级继续运行应用程序控制流。
+- The 10th line is weird, let's ignore it for now, assuming it never happened. Then sp still points to the top of the kernel stack.
+- Lines 13~26 are responsible for restoring the general-purpose registers and CSR from the Trap context at the top of the kernel stack. Note that we need to restore the CSR first and then restore the general registers, so that the three temporary registers we use can be restored correctly.
+- Before line 28, sp points to the top of the kernel stack after saving the Trap context, and sscratch points to the top of the user stack. We reclaim the memory occupied by the Trap context on the kernel stack on line 28, and return to the top of the kernel stack before entering the Trap. In line 30, sscratch and sp are exchanged again. Now sp points to the top of the user stack again, and sscratch still saves the state before entering Trap and points to the top of the kernel stack.
+- After the application control flow state is restored, on line 31 we use the ``sret`` instruction to return to the U privilege level to carry on the application control flow.
+
+.. - 第 10 行比较奇怪我们暂且不管，假设它从未发生，那么 sp 仍然指向内核栈的栈顶。
+.. - 第 13~26 行负责从内核栈顶的 Trap 上下文恢复通用寄存器和 CSR 。注意我们要先恢复 CSR 再恢复通用寄存器，这样我们使用的三个临时寄存器才能被正确恢复。
+.. - 在第 28 行之前，sp 指向保存了 Trap 上下文之后的内核栈栈顶， sscratch 指向用户栈栈顶。我们在第 28 行在内核栈上回收 Trap 上下文所占用的内存，回归进入 Trap 之前的内核栈栈顶。第 30 行，再次交换 sscratch 和 sp，现在 sp 重新指向用户栈栈顶，sscratch 也依然保存进入 Trap 之前的状态并指向内核栈栈顶。
+.. - 在应用程序控制流状态被还原之后，第 31 行我们使用 ``sret`` 指令回到 U 特权级继续运行应用程序控制流。
 
 .. note::
 
-    **sscratch CSR 的用途**
+    **Use of sscratch CSR**
 
-    在特权级切换的时候，我们需要将 Trap 上下文保存在内核栈上，因此需要一个寄存器暂存内核栈地址，并以它作为基地址指针来依次保存 Trap 上下文的内容。但是所有的通用寄存器都不能够用作基地址指针，因为它们都需要被保存，如果覆盖掉它们，就会影响后续应用控制流的执行。
+     When the privilege level is switched, we need to save the Trap context on the kernel stack, so we need a register to temporarily store the kernel stack address, and use it as the base address pointer to sequentially save the contents of the Trap context. But all general-purpose registers cannot be used as base address pointers, because they all need to be saved. And suppose they were overwritten, it would affect the execution of subsequent application control flow.
 
-    事实上我们缺少了一个重要的中转寄存器，而 ``sscratch`` CSR 正是为此而生。从上面的汇编代码中可以看出，在保存 Trap 上下文的时候，它起到了两个作用：首先是保存了内核栈的地址，其次它可作为一个中转站让 ``sp`` （目前指向的用户栈的地址）的值可以暂时保存在 ``sscratch`` 。这样仅需一条 ``csrrw  sp, sscratch, sp`` 指令（交换对 ``sp`` 和 ``sscratch`` 两个寄存器内容）就完成了从用户栈到内核栈的切换，这是一种极其精巧的实现。
+     In fact, we are missing an important transit register, and the ``sscratch`` CSR is born for this. It can be seen from the above assembly code that when saving the Trap context, it plays two roles: firstly, it saves the address of the kernel stack, and secondly, it can be used as a transfer station for ``sp`` (currently pointed to the user stack) to temporarily save the value in ``sscratch``. In this way, only one ``csrrw sp, sscratch, sp`` instruction (exchange the contents of ``sp`` and ``sscratch`` two registers) is needed to achieve the switch from the user stack to the kernel stack, an extremely elegant implementation.
 
-Trap 分发与处理
+    .. **sscratch CSR 的用途**
+
+    .. 在特权级切换的时候，我们需要将 Trap 上下文保存在内核栈上，因此需要一个寄存器暂存内核栈地址，并以它作为基地址指针来依次保存 Trap 上下文的内容。但是所有的通用寄存器都不能够用作基地址指针，因为它们都需要被保存，如果覆盖掉它们，就会影响后续应用控制流的执行。
+
+    .. 事实上我们缺少了一个重要的中转寄存器，而 ``sscratch`` CSR 正是为此而生。从上面的汇编代码中可以看出，在保存 Trap 上下文的时候，它起到了两个作用：首先是保存了内核栈的地址，其次它可作为一个中转站让 ``sp`` （目前指向的用户栈的地址）的值可以暂时保存在 ``sscratch`` 。这样仅需一条 ``csrrw  sp, sscratch, sp`` 指令（交换对 ``sp`` 和 ``sscratch`` 两个寄存器内容）就完成了从用户栈到内核栈的切换，这是一种极其精巧的实现。
+
+.. Trap 分发与处理
+
+Trap Dispatching and Processing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
+Traps are dispatched and processed in the ``trap_handler`` function implemented in Rust:
+
+.. Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
 
 .. code-block:: rust
     :linenos:
@@ -530,8 +563,18 @@ Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
         cx
     }
 
-- 第 4 行声明返回值为 ``&mut TrapContext`` 并在第 25 行实际将传入的Trap 上下文 ``cx`` 原样返回，因此在 ``__restore`` 的时候 ``a0`` 寄存器在调用 ``trap_handler`` 前后并没有发生变化，仍然指向分配 Trap 上下文之后的内核栈栈顶，和此时 ``sp`` 的值相同，这里的 :math:`\text{sp}\leftarrow\text{a}_0` 并不会有问题；
-- 第 7 行根据 ``scause`` 寄存器所保存的 Trap 的原因进行分发处理。这里我们无需手动操作这些 CSR ，而是使用 Rust 的 riscv 库来更加方便的做这些事情。要引入 riscv 库，我们需要：
+- Line 4 declares that the return value is ``&mut TrapContext`` and actually returns the incoming Trap context ``cx`` in line 25. Hence the ``a0`` register in ``__restore`` remain unchanged before and after calling ``trap_handler`` --  it still points to the top of the kernel stack after the Trap context is allocated, which is the same as the value of ``sp`` at this time, here :math:`\text{sp}\leftarrow\ text{a}_0` will not be a problem;
+- Line 7 performs the dispatching according to the Trap reason saved in the ``scause`` register. Here we don't need to manually operate these CSRs, but use Rust's riscv library for more convenience. To import the riscv library, we need:
+
+  .. code-block:: toml
+
+      # os/Cargo.toml
+      
+      [dependencies]
+      riscv = { git = "https://github.com/rcore-os/riscv", features = ["inline-asm"] }  
+
+.. - 第 4 行声明返回值为 ``&mut TrapContext`` 并在第 25 行实际将传入的Trap 上下文 ``cx`` 原样返回，因此在 ``__restore`` 的时候 ``a0`` 寄存器在调用 ``trap_handler`` 前后并没有发生变化，仍然指向分配 Trap 上下文之后的内核栈栈顶，和此时 ``sp`` 的值相同，这里的 :math:`\text{sp}\leftarrow\text{a}_0` 并不会有问题；
+.. - 第 7 行根据 ``scause`` 寄存器所保存的 Trap 的原因进行分发处理。这里我们无需手动操作这些 CSR ，而是使用 Rust 的 riscv 库来更加方便的做这些事情。要引入 riscv 库，我们需要：
 
   .. code-block:: toml
 
@@ -540,18 +583,29 @@ Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
       [dependencies]
       riscv = { git = "https://github.com/rcore-os/riscv", features = ["inline-asm"] }  
     
-- 第 8~11 行，发现触发 Trap 的原因是来自 U 特权级的 Environment Call，也就是系统调用。这里我们首先修改保存在内核栈上的 Trap 上下文里面 sepc，让其增加 4。这是因为我们知道这是一个由 ``ecall`` 指令触发的系统调用，在进入 Trap 的时候，硬件会将 sepc 设置为这条 ``ecall`` 指令所在的地址（因为它是进入 Trap 之前最后一条执行的指令）。而在 Trap 返回之后，我们希望应用程序控制流从 ``ecall`` 的下一条指令开始执行。因此我们只需修改 Trap 上下文里面的 sepc，让它增加 ``ecall`` 指令的码长，也即 4 字节。这样在 ``__restore`` 的时候 sepc 在恢复之后就会指向 ``ecall`` 的下一条指令，并在 ``sret`` 之后从那里开始执行。
+- In lines 8~11, it is found that the trap cause is the Environment Call from the U privilege level, that is, the system call. Here we first modify the sepc in the Trap context saved on the kernel stack to increase it by 4. This is because we know that this is a system call triggered by the ``ecall`` instruction. When entering the Trap, the hardware will set sepc to the address of the ``ecall`` instruction (because it is the address before entering the Trap last executed instruction). And after Trap returns, we want the application control flow to start executing from the next instruction of ``ecall``. Therefore, we only need to modify the sepc in the Trap context to increase the code length of the ``ecall`` instruction, which is 4 bytes. In this way, during ``__restore``, sepc will point to the next instruction of ``ecall`` after restoration, and execute from there after ``sret``.
+
+The a0 register, which is used to hold the return value of the system call, will also change. We take a7 as the syscall ID and the three parameters a0~a2 of the system call from the Trap context, pass them to ``syscall`` function and get the return value. ``syscall`` functions are implemented in the ``syscall`` submodule. This code is the control logic that handles normal system calls.
+
+- Lines 12~20 deal with memory access errors and illegal instruction errors in the application respectively. At this time, you need to print the error message and call ``run_next_app`` to switch and run the next application directly.
+- Starting from line 21, when encountering a trap type that is not yet supported, the entire "Dunkleosteus" batch operating system panics and exits.
+
+.. - 第 8~11 行，发现触发 Trap 的原因是来自 U 特权级的 Environment Call，也就是系统调用。这里我们首先修改保存在内核栈上的 Trap 上下文里面 sepc，让其增加 4。这是因为我们知道这是一个由 ``ecall`` 指令触发的系统调用，在进入 Trap 的时候，硬件会将 sepc 设置为这条 ``ecall`` 指令所在的地址（因为它是进入 Trap 之前最后一条执行的指令）。而在 Trap 返回之后，我们希望应用程序控制流从 ``ecall`` 的下一条指令开始执行。因此我们只需修改 Trap 上下文里面的 sepc，让它增加 ``ecall`` 指令的码长，也即 4 字节。这样在 ``__restore`` 的时候 sepc 在恢复之后就会指向 ``ecall`` 的下一条指令，并在 ``sret`` 之后从那里开始执行。
 
   用来保存系统调用返回值的 a0 寄存器也会同样发生变化。我们从 Trap 上下文取出作为 syscall ID 的 a7 和系统调用的三个参数 a0~a2 传给 ``syscall`` 函数并获取返回值。 ``syscall`` 函数是在 ``syscall`` 子模块中实现的。 这段代码是处理正常系统调用的控制逻辑。
-- 第 12~20 行，分别处理应用程序出现访存错误和非法指令错误的情形。此时需要打印错误信息并调用 ``run_next_app`` 直接切换并运行下一个应用程序。
-- 第 21 行开始，当遇到目前还不支持的 Trap 类型的时候，“邓式鱼” 批处理操作系统整个 panic 报错退出。
+.. - 第 12~20 行，分别处理应用程序出现访存错误和非法指令错误的情形。此时需要打印错误信息并调用 ``run_next_app`` 直接切换并运行下一个应用程序。
+.. - 第 21 行开始，当遇到目前还不支持的 Trap 类型的时候，“邓式鱼” 批处理操作系统整个 panic 报错退出。
 
 
 
-实现系统调用功能
+.. 实现系统调用功能
+
+Implement the System Calls
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-对于系统调用而言， ``syscall`` 函数并不会实际处理系统调用，而只是根据 syscall ID 分发到具体的处理函数：
+For system calls, the ``syscall`` function does not actually process system calls, but only dispatch them to specific processing functions according to the syscall ID:
+
+.. 对于系统调用而言， ``syscall`` 函数并不会实际处理系统调用，而只是根据 syscall ID 分发到具体的处理函数：
 
 .. code-block:: rust
     :linenos:
@@ -566,7 +620,9 @@ Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
         }
     }
 
-这里我们会将传进来的参数 ``args`` 转化成能够被具体的系统调用处理函数接受的类型。它们的实现都非常简单：
+Here we will convert the incoming parameter ``args`` into a type that can be accepted by the specific system call handler. Their implementation is very simple:
+
+.. 这里我们会将传进来的参数 ``args`` 转化成能够被具体的系统调用处理函数接受的类型。它们的实现都非常简单：
 
 .. code-block:: rust
     :linenos:
@@ -596,25 +652,39 @@ Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
         run_next_app()
     }
 
-- ``sys_write`` 我们将传入的位于应用程序内的缓冲区的开始地址和长度转化为一个字符串 ``&str`` ，然后使用批处理操作系统已经实现的 ``print!`` 宏打印出来。注意这里我们并没有检查传入参数的安全性，即使会在出错严重的时候 panic，还是会存在安全隐患。这里我们出于实现方便暂且不做修补。
-- ``sys_exit`` 打印退出的应用程序的返回值并同样调用 ``run_next_app`` 切换到下一个应用程序。
+- ``sys_write`` We convert the incoming start address and length of the buffer located in the application into a string ``&str``, and then use the ``print!`` macro already implemented by the batch operating system print it out. Note that we have not checked the security of the incoming parameters here, even if there is a panic when the error is serious, there will still be security risks. Here we do not make repairs for the convenience of implementation.
+- ``sys_exit`` prints the return value of the exited application and also calls ``run_next_app`` to switch to the next application.
+
+.. - ``sys_write`` 我们将传入的位于应用程序内的缓冲区的开始地址和长度转化为一个字符串 ``&str`` ，然后使用批处理操作系统已经实现的 ``print!`` 宏打印出来。注意这里我们并没有检查传入参数的安全性，即使会在出错严重的时候 panic，还是会存在安全隐患。这里我们出于实现方便暂且不做修补。
+.. - ``sys_exit`` 打印退出的应用程序的返回值并同样调用 ``run_next_app`` 切换到下一个应用程序。
 
 .. _ch2-app-execution:
 
-执行应用程序
+.. 执行应用程序
+
+Execute the Application
 -------------------------------------
 
-当批处理操作系统初始化完成，或者是某个应用程序运行结束或出错的时候，我们要调用 ``run_next_app`` 函数切换到下一个应用程序。此时 CPU 运行在 S 特权级，而它希望能够切换到 U 特权级。在 RISC-V 架构中，唯一一种能够使得 CPU 特权级下降的方法就是执行 Trap 返回的特权指令，如 ``sret`` 、``mret`` 等。事实上，在从操作系统内核返回到运行应用程序之前，要完成如下这些工作：
+When the initialization of the batch operating system is completed, or when an application ends or an error occurs, we need to call the ``run_next_app`` function to switch to the next application. At this point the CPU is running at the S privilege level, and it wants to be able to switch to the U privilege level. In the RISC-V architecture, the only way to lower the CPU privilege level is to execute the privileged instructions returned by Trap, such as ``sret``, ``mret``, etc. In fact, before returning from the operating system kernel to running applications, the following tasks must be completed:
+
+.. 当批处理操作系统初始化完成，或者是某个应用程序运行结束或出错的时候，我们要调用 ``run_next_app`` 函数切换到下一个应用程序。此时 CPU 运行在 S 特权级，而它希望能够切换到 U 特权级。在 RISC-V 架构中，唯一一种能够使得 CPU 特权级下降的方法就是执行 Trap 返回的特权指令，如 ``sret`` 、``mret`` 等。事实上，在从操作系统内核返回到运行应用程序之前，要完成如下这些工作：
+
+- Construct the Trap context needed for the application to start executing;
+- Through the ``__restore`` function, restore part of the registers executed by the application from the newly constructed Trap context;
+- Set the value of the ``sepc`` CSR to the application entry point ``0x80400000``;
+- switch ``scratch`` and ``sp`` registers, set ``sp`` to point to the application user stack;
+- Execute ``sret`` to switch from S privilege level to U privilege level.
+
+.. - 构造应用程序开始执行所需的 Trap 上下文；
+.. - 通过 ``__restore`` 函数，从刚构造的 Trap 上下文中，恢复应用程序执行的部分寄存器；
+.. - 设置 ``sepc`` CSR的内容为应用程序入口点 ``0x80400000``；
+.. - 切换 ``scratch`` 和 ``sp`` 寄存器，设置 ``sp`` 指向应用程序用户栈；
+.. - 执行 ``sret`` 从 S 特权级切换到 U 特权级。
 
 
-- 构造应用程序开始执行所需的 Trap 上下文；
-- 通过 ``__restore`` 函数，从刚构造的 Trap 上下文中，恢复应用程序执行的部分寄存器；
-- 设置 ``sepc`` CSR的内容为应用程序入口点 ``0x80400000``；
-- 切换 ``scratch`` 和 ``sp`` 寄存器，设置 ``sp`` 指向应用程序用户栈；
-- 执行 ``sret`` 从 S 特权级切换到 U 特权级。
+They can achieve the above work more easily by reusing the code of ``__restore``. We only need to push a Trap context specially constructed for starting the application on the kernel stack, and then pass the ``__restore`` function. So that these registers can reach the context state required to start the application.
 
-
-它们可以通过复用 ``__restore`` 的代码来更容易的实现上述工作。我们只需要在内核栈上压入一个为启动应用程序而特殊构造的 Trap 上下文，再通过 ``__restore`` 函数，就能让这些寄存器到达启动应用程序所需要的上下文状态。
+.. 它们可以通过复用 ``__restore`` 的代码来更容易的实现上述工作。我们只需要在内核栈上压入一个为启动应用程序而特殊构造的 Trap 上下文，再通过 ``__restore`` 函数，就能让这些寄存器到达启动应用程序所需要的上下文状态。
 
 .. code-block:: rust
     :linenos:
@@ -636,9 +706,13 @@ Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
         }
     }
 
-为 ``TrapContext`` 实现 ``app_init_context`` 方法，修改其中的 sepc 寄存器为应用程序入口点 ``entry``， sp 寄存器为我们设定的一个栈指针，并将 sstatus 寄存器的 ``SPP`` 字段设置为 User 。
+Implement the ``app_init_context`` method for ``TrapContext``-- modify the sepc register as the application entry point ``entry``. The sp register is a stack pointer we set, and set the ``SPP`` of the sstatus register field is set to User.
 
-在 ``run_next_app`` 函数中我们能够看到：
+.. 为 ``TrapContext`` 实现 ``app_init_context`` 方法，修改其中的 sepc 寄存器为应用程序入口点 ``entry``， sp 寄存器为我们设定的一个栈指针，并将 sstatus 寄存器的 ``SPP`` 字段设置为 User 。
+
+.. 在 ``run_next_app`` 函数中我们能够看到：
+
+In the ``run_next_app`` function we can see:
 
 .. code-block:: rust
     :linenos:
@@ -665,11 +739,15 @@ Trap 在使用 Rust 实现的 ``trap_handler`` 函数中完成分发和处理：
         panic!("Unreachable in batch::run_current_app!");
     }
 
-在高亮行所做的事情是在内核栈上压入一个 Trap 上下文，其 ``sepc`` 是应用程序入口地址 ``0x80400000`` ，其 ``sp`` 寄存器指向用户栈，其 ``sstatus`` 的 ``SPP`` 字段被设置为 User 。``push_context`` 的返回值是内核栈压入 Trap 上下文之后的栈顶，它会被作为 ``__restore`` 的参数（回看 :ref:`__restore 代码 <code-restore>` ，这时我们可以理解为何 ``__restore`` 函数的起始部分会完成 :math:`\text{sp}\leftarrow\text{a}_0` ），这使得在 ``__restore`` 函数中 ``sp`` 仍然可以指向内核栈的栈顶。这之后，就和执行一次普通的 ``__restore`` 函数调用一样了。
+What is done in the highlighted line is to push a Trap context on the kernel stack -- its ``sepc`` is the application entry address ``0x80400000``, its ``sp`` register points to the user stack, and its ``SPP`` field of ``sstatus`` is set to User. The return value of ``push_context`` is the top of the stack after the kernel stack is pushed into the Trap context, and it will be used as the parameter of ``__restore`` (see back :ref:`__restore code <code-restore>`. At this point we can understand why the initial part of the ``__restore`` function will be completed :math:`\text{sp}\leftarrow\text{a}_0` ), which makes the ``__restore`` function ``sp`` can still point to the top of the kernel stack. After that, it's the same as doing a normal ``__restore`` function call.
+
+.. 在高亮行所做的事情是在内核栈上压入一个 Trap 上下文，其 ``sepc`` 是应用程序入口地址 ``0x80400000`` ，其 ``sp`` 寄存器指向用户栈，其 ``sstatus`` 的 ``SPP`` 字段被设置为 User 。``push_context`` 的返回值是内核栈压入 Trap 上下文之后的栈顶，它会被作为 ``__restore`` 的参数（回看 :ref:`__restore 代码 <code-restore>` ，这时我们可以理解为何 ``__restore`` 函数的起始部分会完成 :math:`\text{sp}\leftarrow\text{a}_0` ），这使得在 ``__restore`` 函数中 ``sp`` 仍然可以指向内核栈的栈顶。这之后，就和执行一次普通的 ``__restore`` 函数调用一样了。
 
 .. note::
 
-    有兴趣的同学可以思考： sscratch 是何时被设置为内核栈顶的？
+    Interested students can think: When was sscratch set to the top of the kernel stack?
+
+    .. 有兴趣的同学可以思考： sscratch 是何时被设置为内核栈顶的？
 
 
 
